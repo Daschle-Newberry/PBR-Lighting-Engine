@@ -1,5 +1,6 @@
 package OpenGL_Basic.engine;
 import OpenGL_Basic.engine.Window;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 
 import org.joml.Vector3f;
@@ -97,6 +98,16 @@ public class Camera {
         return this.viewMatrix;
 
     }
+
+    public Matrix4f getViewMatrixNoTranslation(){
+        this.viewMatrix.identity();
+
+        Matrix3f viewMinusTranslation = new Matrix3f().lookAlong(this.cameraFront,this.cameraUp);
+        this.viewMatrix = viewMatrix.set(viewMinusTranslation);
+        return this.viewMatrix;
+    }
+
+
 
     public Matrix4f getProjectionMatrix(){
         return this.projectionMatrix;

@@ -14,8 +14,10 @@ public class GameScene extends Scene{
     //Scene Elements
     private DirectionalLight sun;
     private Model dragon,room,orb;
-    private Material stone;
+    private Material metal,marble;
     private Camera camera;
+
+    private Skybox skybox;
 
     //Gameplay Elements
     private Player player;
@@ -37,20 +39,38 @@ public class GameScene extends Scene{
         //Scene Elements
         sun = new DirectionalLight(new Vector3f(0,0,distance),new Vector3f(0,0,1));
 
-        dragon = new Model("/assets/models/dragon.obj");
+        dragon = new Model("/assets/models/sphere.obj");
         dragon.setScale(.2f);
         dragon.setPosition(new Vector3f(0,0.2f,0));
-//        dragon.setRotation(20,new Vector3f(0,1,0));
+        dragon.setRotation(20,new Vector3f(0,1,0));
 
         room = new Model("/assets/models/room.obj");
         room.setScale(2f);
 
         orb =  new Model("/assets/models/sphere.obj");
         orb.setScale(.2f);
+        metal = new Material(
+                "/assets/materials/rusted_iron/albedo.png","/assets/materials/rusted_iron/normal.png",
+                "/assets/materials/rusted_iron/metallic.png","/assets/materials/rusted_iron/roughness.png",
+                "/assets/materials/rusted_iron/ao.png");
 
-        stone = new Material("/assets/textures/container.jpg");
+        marble = new Material(
+                "/assets/materials/marble/marble-speckled-albedo.png",
+                "/assets/materials/marble/marble-speckled-normal.png",
+                "/assets/materials/marble/marble-speckled-metalness.png",
+                "/assets/materials/marble/marble-speckled-roughness.png",
+                null
+        );
 
         camera = new Camera(new Vector3f(0.0f,0.0f,0.0f),1);
+
+        skybox =  new Skybox(new String[]{
+                        "/assets/skybox/right.jpg",
+                        "/assets/skybox/left.jpg",
+                        "/assets/skybox/top.jpg",
+                        "/assets/skybox/bottom.jpg",
+                        "/assets/skybox/front.jpg",
+                        "/assets/skybox/back.jpg"});
 
         //Gameplay Elements
         player = new Player(new Vector3f(0,0,0),camera);
@@ -135,11 +155,12 @@ public class GameScene extends Scene{
         shadowMap.bindToRead();
 
         glEnable(GL_DEPTH_TEST|GL_CULL_FACE);
+        glDepthFunc(GL_LESS);
         glCullFace(GL_BACK);
 
 
-        glClearColor(0f,0f,0f,1.0f);
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        glClearColor(.2f,.2f,.2f,1f);
+        glClear(GL_DEPTH_BUFFER_BIT);
 
         glViewport(0,0,Window.get().width,Window.get().height);
 
@@ -157,7 +178,7 @@ public class GameScene extends Scene{
 
 
         Shaders.mainProgram.uploadVec3f("sun.color",new Vector3f(1.0f));
-        Shaders.mainProgram.uploadVec3f("sun.intensity",new Vector3f(2.0f));
+        Shaders.mainProgram.uploadVec3f("sun.intensity",new Vector3f(1f));
         Shaders.mainProgram.uploadVec3f("sun.direction",sun.getLightFront());
 
 
@@ -179,11 +200,15 @@ public class GameScene extends Scene{
         Shaders.mainProgram.uploadMat4f("modelMatrix",dragon.getModelMatrix());
         Shaders.mainProgram.uploadInt("isTextured",1);
         Shaders.mainProgram.uploadInt("textureIMG",0);
-        stone.bindTexture();
+        marble.bind();
 
-        Shaders.mainProgram.uploadFloat("material.roughness",0.1f);
-        Shaders.mainProgram.uploadVec3f("material.color",new Vector3f(1.0f,0f,1f));
-        Shaders.mainProgram.uploadFloat("material.metallic",1f);
+        Shaders.mainProgram.uploadInt("albedo",0);
+        Shaders.mainProgram.uploadInt("normal",1);
+        Shaders.mainProgram.uploadInt("metallic",2);
+        Shaders.mainProgram.uploadInt("roughness",3);
+        Shaders.mainProgram.uploadInt("AO",4);
+
+
         dragon.render();
 
         Shaders.mainProgram.uploadMat4f("modelMatrix",room.getModelMatrix());
@@ -198,8 +223,22 @@ public class GameScene extends Scene{
         glBindVertexArray(0);
 
     }
+
+    private void skyboxPass(){
+        screenBuffer.bind();
+        glDepthMask(false);
+        glDisable(GL_CULL_FACE);
+
+        Shaders.skyboxProgram.use();
+        Shaders.skyboxProgram.uploadMat4f("cameraViewMatrix",camera.getViewMatrixNoTranslation());
+        Shaders.skyboxProgram.uploadMat4f("cameraProjectionMatrix",camera.getProjectionMatrix());
+        skybox.render();
+        glDepthMask(true);
+
+    }
     @Override
     public void render() {
+        skyboxPass();
         shadowPass();
         lightingPass();
         screenBuffer.render();

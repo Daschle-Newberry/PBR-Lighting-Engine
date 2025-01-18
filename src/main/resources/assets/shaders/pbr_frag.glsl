@@ -2,7 +2,7 @@
 
 #define pi 3.1415926535897932384626433832795
 #define lightColor vec3(1.0)
-#define ambientStrength .4
+#define ambientStrength .03
 #define shadowFilterSize 16
 
 struct DirectionalLight
@@ -16,8 +16,14 @@ struct PBRMaterial
 {
     float roughness;
     float metallic;
-    vec3 color;
+    vec3 albedo;
 };
+
+uniform sampler2D albedo;
+uniform sampler2D normal;
+uniform sampler2D metallic;
+uniform sampler2D roughness;
+uniform sampler2D AO;
 
 
 uniform sampler2D textureImg;
@@ -28,7 +34,6 @@ uniform DirectionalLight sun;
 uniform vec2 shadowMapDimensions;
 uniform vec3 cameraPos;
 
-uniform PBRMaterial material;
 
 in vec2 UV;
 in vec3 fragNormal;
@@ -38,7 +43,7 @@ in vec3 fragPos;
 out vec4 outColor;
 
 
-
+PBRMaterial material = PBRMaterial(texture(roughness,UV).r,texture(metallic,UV).r,texture(albedo,UV).rgb);
 
 float calcShadowFactor(){
     vec3 projCoords = fragLightSpacePos.xyz/fragLightSpacePos.w;
@@ -66,60 +71,68 @@ float calcShadowFactor(){
     return sum/float(pow(shadowFilterSize,2));
 }
 
-float calculateNormalDistribution(float nDh){
-    float alpha2 = material.roughness * material.roughness * material.roughness * material.roughness;
-    float denominator = (nDh*nDh) * (alpha2 - 1) + 1;
-    return alpha2/(denominator * denominator);
+float distributionGGX(float nDh){
+    float alpha2 = pow(material.roughness,4.0f);
+    float denominator = pow(nDh,2.0f) * (alpha2 - 1.0f) + 1.0f;
+    denominator = pi * pow(denominator,2.0f);
+    return alpha2/max(denominator,0.000001f);
 }
 
-float calculateGeometryShadowing(float dp){
-    float k = ((material.roughness + 1)*(material.roughness + 1))/8.0f;
-    return dp/(dp * (1-k) + k);
+float geometryShadowSmith(float dp){
+    float r = material.roughness + 1.0f;
+    float k = pow(r,2.0f)/8.0f;
+    float denominator = dp * (1.0f - k) + k;
+    return dp/denominator;
 }
 
-vec3 calculateFresnel(vec3 F0,float vDh){
-
-    vec3 ret = F0 + (1-F0) * pow(1.0-max(vDh,0.0),5);
-
+vec3 fresnelSchlick(vec3 F0,float vDh){
+    vec3 ret = F0 + (1.0f - F0) * pow(1.0 - vDh,5.0f);
     return ret;
 }
 
 
 vec3 calculatePBRLighting(DirectionalLight light){
-    vec3 lightIntensity = light.color * light.intensity;
 
-    vec3 lightDirection = light.direction;
-    vec3 fragToCamera = normalize(cameraPos - fragPos);
-    vec3 halfVector = normalize(fragToCamera + lightDirection);
-    vec3 normal = normalize(fragNormal);
+    vec3 radiance = light.color * light.intensity;
+    vec3 baseReflectivity = mix(vec3(0.04),material.albedo,material.metallic);
 
-    float nDh = max(dot(normal,halfVector),0.0);
-    float nDv = max(dot(normal,fragToCamera),0.0f);
-    float nDl = max(dot(normal,lightDirection),0.0f);
-    float vDh = dot(fragToCamera,halfVector);
+    vec3 N = normalize(fragNormal);
+    vec3 V = normalize(cameraPos - fragPos);
+    vec3 L = normalize(light.direction);
+    vec3 H = normalize(V + L);
+
+    float nDh = dot(N,H);
+    float nDv = max(dot(N,V),0.000001f);
+    float nDl = max(dot(N,L),0.000001f);
+    float vDh = dot(V,H);
 
 
-    float D = calculateNormalDistribution(nDh);
-    float G1 = calculateGeometryShadowing(nDv);
-    float G2 = calculateGeometryShadowing(nDl);
+    float D = distributionGGX(nDh);
+    float G1 = geometryShadowSmith(nDv);
+    float G2 = geometryShadowSmith(nDl);
+    float GG = G1 * G2;
+    vec3 F = fresnelSchlick(baseReflectivity,vDh);
 
-    vec3 F0 = material.color;
-    vec3 F = calculateFresnel(F0,vDh);
+    vec3 specular = D * GG * F;
 
-    float denominator = 4 * nDv * nDl + .0001f;
-    vec3 specularBRDF = (D * (G1*G2) * F)/denominator;
+    specular /= (4.0f * nDv * nDl);
 
-    vec3 diffuseBRDF = (vec3(1.0) - F) * (1.0 - material.metallic);
+    vec3 kD = vec3(1.0f) - F;
 
-    vec3 lambert = material.color/pi;
+    kD *= 1.0 - material.metallic;
 
-    vec3 finalColor = ((diffuseBRDF * lambert) + specularBRDF) * lightIntensity * nDl;
 
-    return finalColor;
+    return (kD * material.albedo/pi + specular) * radiance * nDl;
 
 
 
 }
 void main() {
-    outColor = vec4(calculatePBRLighting(sun),1.0);
+    vec3 outputLum = vec3(0);
+    outputLum += calculatePBRLighting(sun);
+
+    outputLum = outputLum / (outputLum + vec3(1.0));
+    outputLum = pow(outputLum,vec3(1.0/2.2));
+
+    outColor = vec4(outputLum,1.0);
 }

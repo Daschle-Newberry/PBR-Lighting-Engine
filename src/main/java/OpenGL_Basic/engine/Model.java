@@ -172,10 +172,10 @@ private static void processMesh(AIMesh mesh, ArrayList<Float> vertexAttributesLi
             vertexAttributesList.add(normals.y());
             vertexAttributesList.add(normals.z());
 
-        }
 
+         }
+    }
 
     }
-}
 }
 

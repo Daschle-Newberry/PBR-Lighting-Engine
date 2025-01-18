@@ -5,6 +5,7 @@ public class Shaders {
     public static Shader screenProgram;
     public static Shader shadowProgram;
     public static Shader lightSourceProgram;
+    public static Shader skyboxProgram;
 
     public static void loadShaders(){
 
@@ -19,5 +20,8 @@ public class Shaders {
 
         lightSourceProgram =  new Shader("/assets/shaders/light_vert.glsl","/assets/shaders/light_frag.glsl");
         lightSourceProgram.compile();
+
+        skyboxProgram =  new Shader("/assets/shaders/skybox_vert.glsl","/assets/shaders/skybox_frag.glsl");
+        skyboxProgram.compile();
     }
 }

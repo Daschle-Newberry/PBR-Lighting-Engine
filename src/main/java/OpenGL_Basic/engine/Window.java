@@ -94,7 +94,6 @@ public class Window {
 
         //Create Window
         glfwWindow = glfwCreateWindow(this.width,this.height,this.title,NULL,NULL);
-
         //Callbacks
         glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallBack);
         glfwSetMouseButtonCallback(glfwWindow,MouseListener::mouseButtonCallBack);
