@@ -1,6 +1,7 @@
 package OpenGL_Basic.renderer;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
@@ -20,7 +21,7 @@ public class Shader {
 
     private FloatBuffer matBuffer = BufferUtils.createFloatBuffer(16);
     private FloatBuffer vec3fBuffer = BufferUtils.createFloatBuffer(3);
-    private IntBuffer vec2iBuffer = BufferUtils.createIntBuffer(2);
+    private FloatBuffer vec2fBuffer = BufferUtils.createFloatBuffer(2);
 
     public Shader(String vert_path,String frag_path){
         vertex_path = vert_path;
@@ -144,10 +145,10 @@ public class Shader {
         vec3fBuffer.clear();
     }
 
-    public void uploadVec2i(String varName, Vector2i vector){
+    public void uploadVec2f(String varName, Vector2f vector){
         int location = glGetUniformLocation(this.shaderProgram,varName);
-        glUniform2iv(location,vector.get(vec2iBuffer));
-        vec2iBuffer.clear();
+        glUniform2fv(location,vector.get(vec2fBuffer));
+        vec2fBuffer.clear();
     }
 
     }

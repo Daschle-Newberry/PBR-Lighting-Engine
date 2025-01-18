@@ -69,6 +69,7 @@ public void render(){
 public Matrix4f getModelMatrix(){
         modelMatrix.identity();
         scale.mul(position,modelMatrix);
+        rotation.mul(modelMatrix,modelMatrix);
         return modelMatrix;
 }
 
@@ -82,6 +83,10 @@ public void setPosition(Vector3f position){
         this.position.translation(position);
 }
 
+public void setRotation(float angle, Vector3f axis){
+        this.rotation.identity();
+        this.rotation.rotation(angle,axis);
+}
 public static float[] loadModelFile(String filePath) {
     InputStream modelDataStream = Model.class.getResourceAsStream(filePath);
 
@@ -123,7 +128,6 @@ public static float[] loadModelFile(String filePath) {
     for (int q = 0; q < vertexAttributes.length; q++){
         index += 1;
         if (index == 9){
-            System.out.println();
             index = 0;
         }
     }
@@ -150,10 +154,16 @@ private static void processMesh(AIMesh mesh, ArrayList<Float> vertexAttributesLi
             vertexAttributesList.add(position.y());
             vertexAttributesList.add(position.z());
 
-           AIVector3D texCoords = textureCoordinates.get(vertexIndex);
+            if(textureCoordinates != null){
+                AIVector3D texCoords = textureCoordinates.get(vertexIndex);
 
-           vertexAttributesList.add(texCoords.x());
-           vertexAttributesList.add(texCoords.y());
+                vertexAttributesList.add(texCoords.x());
+                vertexAttributesList.add(texCoords.y());
+            } else{
+                vertexAttributesList.add(0f);
+                vertexAttributesList.add(0f);
+            }
+
 
 
             AIVector3D normals = normalVectors.get(vertexIndex);

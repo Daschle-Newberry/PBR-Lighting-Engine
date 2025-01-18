@@ -8,7 +8,7 @@ public class Shaders {
 
     public static void loadShaders(){
 
-        mainProgram = new Shader("/assets/shaders/default_vert.glsl","/assets/shaders/default_frag.glsl");
+        mainProgram = new Shader("/assets/shaders/default_vert.glsl","/assets/shaders/pbr_frag.glsl");
         mainProgram.compile();
 
         screenProgram =  new Shader("/assets/shaders/post_processing_vert.glsl","/assets/shaders/post_processing_frag.glsl");

@@ -16,7 +16,6 @@ public class Camera {
 
     private Vector3f heightOffset = new Vector3f(0.0f,2f,0.0f);
 
-    private static Vector3f orbitPosition = new Vector3f(0.0f,0.0f,-1.0f);;
 
     private float lookX;
     private float lookY;
@@ -45,39 +44,23 @@ public class Camera {
         this.yaw += xOffset;
         this.pitch += yOffset;
 
-        if (type == 0) {
-            if (this.pitch >= 1f) {
-                this.pitch = 1f;
-
-            }
-            if (this.pitch <= -1f) {
-                this.pitch = -1f;
-            }
-        }
-        else if (type == 1){
-            if (this.pitch >= 89f) {
-                this.pitch = 89f;
-
-            }
-            if (this.pitch <= -89f) {
-                this.pitch = -89f;
-            }
-
-            this.lookX = (float)(Math.cos(Math.toRadians(this.yaw)) * Math.cos(Math.toRadians(this.pitch)));
-            this.lookY = (float)(Math.sin(Math.toRadians(this.pitch)));
-            this.lookZ = (float)(Math.sin(Math.toRadians(this.yaw)) * Math.cos(Math.toRadians(this.pitch)));
-
-            this.cameraFront = new Vector3f(-this.lookX,this.lookY,this.lookZ).normalize();
-
+        if (this.pitch >= 89f) {
+            this.pitch = 89f;
 
         }
+        if (this.pitch <= -89f) {
+            this.pitch = -89f;
+        }
+
+        this.lookX = (float)(Math.cos(Math.toRadians(this.yaw)) * Math.cos(Math.toRadians(this.pitch)));
+        this.lookY = (float)(Math.sin(Math.toRadians(this.pitch)));
+        this.lookZ = (float)(Math.sin(Math.toRadians(this.yaw)) * Math.cos(Math.toRadians(this.pitch)));
+
+        this.cameraFront = new Vector3f(-this.lookX,this.lookY,this.lookZ).normalize();
+
     }
 
-    private void updateCameraVectors(){
 
-
-
-    }
     public void adjustProjection(){
         projectionMatrix.identity();
         projectionMatrix.perspective(45,(float) Window.get().width/Window.get().height,0.1f,1000.0f);
@@ -106,17 +89,11 @@ public class Camera {
         }
     }
     public Matrix4f getViewMatrix(){
-        if (type == 0) {
-            Matrix4f translation = new Matrix4f().translation(orbitPosition);
-            Matrix4f rotation = new Matrix4f().rotationXYZ(-this.pitch, this.yaw, 0);
-            this.viewMatrix = translation.mul(rotation);
-        }
-        else if (type == 1) {
-            this.viewMatrix.identity();
-            this.viewMatrix = viewMatrix.lookAt(this.position,
-                    new Vector3f(this.position.x + this.cameraFront.x,this.position.y + this.cameraFront.y,this.position.z + this.cameraFront.z),
-                    this.cameraUp);
-        }
+        this.viewMatrix.identity();
+        this.viewMatrix = viewMatrix.lookAt(this.position,
+                new Vector3f(this.position.x + this.cameraFront.x,this.position.y + this.cameraFront.y,this.position.z + this.cameraFront.z),
+                this.cameraUp);
+
         return this.viewMatrix;
 
     }
@@ -139,4 +116,7 @@ public class Camera {
         return result;
     }
 
+    public Vector3f getCameraPosition() {
+        return position;
+    }
 }

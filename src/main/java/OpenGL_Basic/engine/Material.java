@@ -36,7 +36,6 @@ public class Material {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
         textureIndex = textureCount;
-        System.out.println(textureIndex);
         textureCount++;
 
     }

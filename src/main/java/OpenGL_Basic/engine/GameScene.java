@@ -4,53 +4,62 @@ import OpenGL_Basic.engine.input.KeyListener;
 import OpenGL_Basic.engine.input.MouseListener;
 import OpenGL_Basic.engine.postprocessing.ScreenBuffer;
 import OpenGL_Basic.engine.postprocessing.ShadowMap;
+import OpenGL_Basic.renderer.Shader;
 import OpenGL_Basic.renderer.Shaders;
 import org.joml.Vector3f;
 
 import static org.lwjgl.opengl.GL30.*;
 
 public class GameScene extends Scene{
+    //Scene Elements
     private DirectionalLight sun;
-    private int ticks;
-    private int distance;
-
-    private Model cube;
-    private Model room;
-    private Model orb;
-
+    private Model dragon,room,orb;
     private Material stone;
-
     private Camera camera;
+
+    //Gameplay Elements
+    private Player player;
+
+
+    //Rendering Elements
     private ScreenBuffer screenBuffer;
     private ShadowMap shadowMap;
-
-    private int cullMode;
     private boolean renderTris;
-    private Player player;
+
+
+    //Misc
+    private int ticks;
+    private int distance = 3;
+
+
     @Override
     public void init() {
-        Shaders.loadShaders();
-        camera = new Camera(new Vector3f(0.0f,0.0f,0.0f),1);
+        //Scene Elements
+        sun = new DirectionalLight(new Vector3f(0,0,distance),new Vector3f(0,0,1));
 
-        cube = new Model("/assets/models/cube.obj");
-        stone = new Material("/assets/textures/container.jpg");
-        cube.setScale(.2f);
-        cube.setPosition(new Vector3f(0,1.001f,0));
+        dragon = new Model("/assets/models/dragon.obj");
+        dragon.setScale(.2f);
+        dragon.setPosition(new Vector3f(0,0.2f,0));
+//        dragon.setRotation(20,new Vector3f(0,1,0));
 
         room = new Model("/assets/models/room.obj");
         room.setScale(2f);
 
-
         orb =  new Model("/assets/models/sphere.obj");
         orb.setScale(.2f);
 
-        sun = new DirectionalLight(new Vector3f(0,3.371f,3.369f),new Vector3f(0,.06743f,.7385f));
+        stone = new Material("/assets/textures/container.jpg");
 
+        camera = new Camera(new Vector3f(0.0f,0.0f,0.0f),1);
+
+        //Gameplay Elements
+        player = new Player(new Vector3f(0,0,0),camera);
+
+        //Render Elements
         screenBuffer = new ScreenBuffer();
         shadowMap = new ShadowMap(2560,1440);
         shadowMap.setShadowMapProjectionOrtho();
-
-        player = new Player(new Vector3f(0,0,0),camera);
+        Shaders.loadShaders();
 
     }
 
@@ -65,43 +74,31 @@ public class GameScene extends Scene{
         MouseListener.proccessMovement();
 
 
-//        if (KeyListener.get().isKeyPressed(265)){
-//           ticks++;
-//           tickSun();
-//        }
-//        else if(KeyListener.get().isKeyPressed(264)){
-//           ticks--;
-//           tickSun();
-//        }
-//        else if(KeyListener.get().isKeyPressed(263)){
-//            if (distance > 0){
-//                distance --;
-//                tickSun();
-//            }
-//        }
-//        else if(KeyListener.get().isKeyPressed(262)){
-//            distance ++;
-//            tickSun();
-//
-//        }
-//
-//        else if(KeyListener.get().isKeyPressed(32)){
-//            System.out.println("Front " + sun.getLightFront() + " Position " + sun.getPosition());
-//
-//        }
+        if (KeyListener.get().isKeyPressed(265)){
+           ticks++;
+           tickSun();
+        }
+        else if(KeyListener.get().isKeyPressed(264)){
+           ticks--;
+           tickSun();
+        }
+        else if(KeyListener.get().isKeyPressed(263)){
+            if (distance > 3){
+                distance --;
+                tickSun();
+            }
+        }
+        else if(KeyListener.get().isKeyPressed(262)){
+            distance ++;
+            tickSun();
+
+        }
+
         orb.setPosition(sun.getPosition());
         player.updatePlayer();
 
 
-        if (KeyListener.get().isKeyPressed(49)){
-          cullMode = 0;
-        }
-        else if(KeyListener.get().isKeyPressed(50)){
-         cullMode = 1;
-        }
-        else if(KeyListener.get().isKeyPressed(51)){
-          cullMode = 2;
-        }
+
         render();
     }
 
@@ -113,19 +110,15 @@ public class GameScene extends Scene{
     private void shadowPass(){
         shadowMap.bindToWrite();
         Shaders.shadowProgram.use();
-
-        glDisable(GL_CULL_FACE);
-
         glEnable(GL_DEPTH_TEST);
-
         glClear(GL_DEPTH_BUFFER_BIT);
 
 
         Shaders.shadowProgram.uploadMat4f("projectionMatrix", shadowMap.getProjectionMatrix());
         Shaders.shadowProgram.uploadMat4f("viewMatrix", sun.getViewMatrix());
-        Shaders.shadowProgram.uploadMat4f("modelMatrix", cube.getModelMatrix());
+        Shaders.shadowProgram.uploadMat4f("modelMatrix", dragon.getModelMatrix());
 
-        cube.render();
+        dragon.render();
 
         Shaders.shadowProgram.uploadMat4f("modelMatrix", room.getModelMatrix());
 
@@ -141,8 +134,7 @@ public class GameScene extends Scene{
         screenBuffer.bind();
         shadowMap.bindToRead();
 
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST|GL_CULL_FACE);
         glCullFace(GL_BACK);
 
 
@@ -152,46 +144,64 @@ public class GameScene extends Scene{
         glViewport(0,0,Window.get().width,Window.get().height);
 
 
-        glDisable(GL_CULL_FACE);
         Shaders.lightSourceProgram.use();
 
         Shaders.lightSourceProgram.uploadMat4f("cameraViewMatrix",camera.getViewMatrix());
         Shaders.lightSourceProgram.uploadMat4f("cameraProjectionMatrix",camera.getProjectionMatrix());
         Shaders.lightSourceProgram.uploadMat4f("modelMatrix",orb.getModelMatrix());
-
         orb.render();
+
+        /// MAIN PASS///
 
         Shaders.mainProgram.use();
 
 
-        Shaders.mainProgram.uploadVec3f("sunDirection",sun.getLightFront());
+        Shaders.mainProgram.uploadVec3f("sun.color",new Vector3f(1.0f));
+        Shaders.mainProgram.uploadVec3f("sun.intensity",new Vector3f(2.0f));
+        Shaders.mainProgram.uploadVec3f("sun.direction",sun.getLightFront());
+
+
+        Shaders.mainProgram.uploadVec3f("cameraPos", camera.getCameraPosition());
+
         Shaders.mainProgram.uploadMat4f("cameraViewMatrix",camera.getViewMatrix());
         Shaders.mainProgram.uploadMat4f("cameraProjectionMatrix",camera.getProjectionMatrix());
 
         Shaders.mainProgram.uploadMat4f("lightViewMatrix",sun.getViewMatrix());
         Shaders.mainProgram.uploadMat4f("lightProjectionMatrix",shadowMap.getProjectionMatrix());
 
-        Shaders.mainProgram.uploadInt("textureIMG",0);
+        Shaders.mainProgram.uploadVec2f("shadowMapDimensions",shadowMap.getMapDimensions());
         Shaders.mainProgram.uploadInt("shadowMap",1);
 
-        Shaders.mainProgram.uploadMat4f("modelMatrix",cube.getModelMatrix());
+
+
+
+
+        Shaders.mainProgram.uploadMat4f("modelMatrix",dragon.getModelMatrix());
         Shaders.mainProgram.uploadInt("isTextured",1);
+        Shaders.mainProgram.uploadInt("textureIMG",0);
         stone.bindTexture();
-        cube.render();
+
+        Shaders.mainProgram.uploadFloat("material.roughness",0.1f);
+        Shaders.mainProgram.uploadVec3f("material.color",new Vector3f(1.0f,0f,1f));
+        Shaders.mainProgram.uploadFloat("material.metallic",1f);
+        dragon.render();
 
         Shaders.mainProgram.uploadMat4f("modelMatrix",room.getModelMatrix());
         Shaders.mainProgram.uploadInt("isTextured",0);
-        room.render();
+
+        Shaders.mainProgram.uploadFloat("material.roughness",1.0f);
+        Shaders.mainProgram.uploadVec3f("material.color",new Vector3f(0.0f,.4f,.4f));
+        Shaders.mainProgram.uploadInt("material.metallic",0);
+//        room.render();
 
         Shaders.mainProgram.detach();
         glBindVertexArray(0);
-        //Render to screen
-        screenBuffer.render();
+
     }
     @Override
     public void render() {
         shadowPass();
         lightingPass();
-
+        screenBuffer.render();
     }
 }

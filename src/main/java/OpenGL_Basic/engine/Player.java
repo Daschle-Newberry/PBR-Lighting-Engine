@@ -6,7 +6,7 @@ import org.joml.Vector2i;
 import org.joml.Vector3f;
 
 public class Player {
-    private static float speed = .2f;
+    private static float speed = .05f;
 
     private Vector3f position;
     private Camera camera;

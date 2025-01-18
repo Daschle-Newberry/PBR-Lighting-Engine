@@ -1,7 +1,9 @@
 package OpenGL_Basic.engine.postprocessing;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector2i;
+import org.joml.Vector3f;
 
 import java.nio.FloatBuffer;
 
@@ -10,10 +12,10 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL30.*;
 
 public class ShadowMap {
-    public int FBO;
-    private int mapWidth,mapHeight;
-    private int shadowMap;
+    private int mapWidth,mapHeight,FBO,shadowMap;
     private Matrix4f shadowProjection;
+
+
 
     public ShadowMap(int width, int height){
         FBO = glGenFramebuffers();
@@ -26,8 +28,10 @@ public class ShadowMap {
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
 
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_BORDER);
+
+        glTexParameterfv(GL_TEXTURE_2D,GL_TEXTURE_BORDER_COLOR,new float[]{1.0f,1.0f,1.0f,1.0f});
 
         glBindFramebuffer(GL_FRAMEBUFFER,FBO);
         glFramebufferTexture2D(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_TEXTURE_2D,shadowMap,0);
@@ -39,25 +43,17 @@ public class ShadowMap {
             assert false : "Framebuffer Error: " + ShadowMap.class.getSimpleName();
 
         }
-
         glBindFramebuffer(GL_FRAMEBUFFER,0);
-
-
         setShadowMapProjectionOrtho();
-    }
-    public void setShadowMapProjectionPerspective(){
-        shadowProjection = new Matrix4f().identity();
-        shadowProjection.perspective(45,(float) mapWidth/mapHeight,0.1f,100.0f);
+
     }
 
     public void setShadowMapProjectionOrtho(){
         shadowProjection = new Matrix4f().identity();
-        shadowProjection.ortho(-5,5,-5,5,0.1f,10f);
+        shadowProjection.ortho(-5,5,-5,5,0.1f,20f);
     }
 
-    public Matrix4f getProjectionMatrix(){
-        return this.shadowProjection;
-    }
+    public Matrix4f getProjectionMatrix(){return this.shadowProjection;}
 
     public void bindToWrite(){
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER,FBO);
@@ -66,10 +62,11 @@ public class ShadowMap {
     public void bindToRead(){
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D,shadowMap);
+
     }
 
-    public Vector2i getMapDimensions(){
-        return new Vector2i(this.mapWidth,this.mapHeight);
+    public Vector2f getMapDimensions(){
+        return new Vector2f(this.mapWidth,this.mapHeight);
     }
 
 }
