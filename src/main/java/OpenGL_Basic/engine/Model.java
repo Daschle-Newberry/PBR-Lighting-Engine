@@ -47,15 +47,20 @@ public class Model{
 
         // XYZ
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0,3,GL_FLOAT,false,8 * floatBytes,0);
+        glVertexAttribPointer(0,3,GL_FLOAT,false,11 * floatBytes,0);
 
         // UV
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1,2,GL_FLOAT,false,8 * floatBytes,3 * floatBytes);
+        glVertexAttribPointer(1,2,GL_FLOAT,false,11 * floatBytes,3 * floatBytes);
 
         //Normals
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2,3,GL_FLOAT,false,8 * floatBytes,5 * floatBytes);
+        glVertexAttribPointer(2,3,GL_FLOAT,false,11 * floatBytes,5 * floatBytes);
+
+
+        //Tangents
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3,3,GL_FLOAT,false,11 * floatBytes,8 * floatBytes);
 }
 
 public void render(){
@@ -113,7 +118,7 @@ public static float[] loadModelFile(String filePath) {
     }catch(IOException e){
         throw new RuntimeException("Error writing to temp file",e);
     }
-    AIScene scene = Assimp.aiImportFile(tempFile.getAbsolutePath(),Assimp.aiProcess_Triangulate);
+    AIScene scene = Assimp.aiImportFile(tempFile.getAbsolutePath(),Assimp.aiProcess_GenSmoothNormals|Assimp.aiProcess_CalcTangentSpace);
     PointerBuffer buffer = scene.mMeshes();
     ArrayList<Float> vertexAttributesList = new ArrayList<Float>();
     for(int i = 0; i < buffer.limit(); i++){
@@ -138,6 +143,7 @@ private static void processMesh(AIMesh mesh, ArrayList<Float> vertexAttributesLi
     AIVector3D.Buffer positionVectors = mesh.mVertices();
     AIVector3D.Buffer textureCoordinates = mesh.mTextureCoords(0);
     AIVector3D.Buffer normalVectors = mesh.mNormals();
+    AIVector3D.Buffer tangentVectors = mesh.mTangents();
 
     AIFace.Buffer faces = mesh.mFaces();
 
@@ -172,8 +178,14 @@ private static void processMesh(AIMesh mesh, ArrayList<Float> vertexAttributesLi
             vertexAttributesList.add(normals.y());
             vertexAttributesList.add(normals.z());
 
+            AIVector3D tangents = tangentVectors.get(vertexIndex);
+            vertexAttributesList.add(tangents.x());
+            vertexAttributesList.add(tangents.y());
+            vertexAttributesList.add(tangents.z());
 
-         }
+
+
+        }
     }
 
     }

@@ -92,6 +92,7 @@ public class Window {
         glfwWindowHint(GLFW_MAXIMIZED,GLFW_TRUE);
         glfwWindowHint(GLFW_SAMPLES,4);
 
+
         //Create Window
         glfwWindow = glfwCreateWindow(this.width,this.height,this.title,NULL,NULL);
         //Callbacks

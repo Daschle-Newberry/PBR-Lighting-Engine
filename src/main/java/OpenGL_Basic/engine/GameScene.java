@@ -14,7 +14,7 @@ public class GameScene extends Scene{
     //Scene Elements
     private DirectionalLight sun;
     private Model dragon,room,orb;
-    private Material metal,marble;
+    private Material rustedMetal,gold,futureMetal,greenTile;
     private Camera camera;
 
     private Skybox skybox;
@@ -31,7 +31,7 @@ public class GameScene extends Scene{
 
     //Misc
     private int ticks;
-    private int distance = 3;
+    private int distance = 8;
 
 
     @Override
@@ -49,19 +49,35 @@ public class GameScene extends Scene{
 
         orb =  new Model("/assets/models/sphere.obj");
         orb.setScale(.2f);
-        metal = new Material(
-                "/assets/materials/rusted_iron/albedo.png","/assets/materials/rusted_iron/normal.png",
-                "/assets/materials/rusted_iron/metallic.png","/assets/materials/rusted_iron/roughness.png",
+        rustedMetal = new Material(
+                "/assets/materials/rusted_iron/albedo.png",
+                "/assets/materials/rusted_iron/normal.png",
+                "/assets/materials/rusted_iron/metallic.png",
+                "/assets/materials/rusted_iron/roughness.png",
                 "/assets/materials/rusted_iron/ao.png");
 
-        marble = new Material(
-                "/assets/materials/marble/marble-speckled-albedo.png",
-                "/assets/materials/marble/marble-speckled-normal.png",
-                "/assets/materials/marble/marble-speckled-metalness.png",
-                "/assets/materials/marble/marble-speckled-roughness.png",
-                null
+        gold = new Material(
+                "/assets/materials/gold/albedo.png",
+                "/assets/materials/gold/normal.png",
+                "/assets/materials/gold/metallic.png",
+                "/assets/materials/gold/roughness.png",
+                "/assets/materials/gold/ao.png"
         );
 
+        futureMetal = new Material(
+                "/assets/materials/future_metal/futurism-metal_albedo.png",
+                "/assets/materials/future_metal/futurism-metal_normal-ogl.png",
+                "/assets/materials/future_metal/futurism-metal_metallic.png",
+                "/assets/materials/future_metal/futurism-metal_roughness.png",
+                "/assets/materials/future_metal/futurism-metal_ao.png"
+            );
+        greenTile = new Material(
+                "/assets/materials/green_tile/green-shower-tile1_albedo.png",
+                "/assets/materials/green_tile/green-shower-tile1_normal-ogl.png",
+                "/assets/materials/green_tile/green-shower-tile1_metallic.png",
+                "/assets/materials/green_tile/green-shower-tile1_roughness.png",
+                "/assets/materials/green_tile/green-shower-tile1_ao.png"
+        );
         camera = new Camera(new Vector3f(0.0f,0.0f,0.0f),1);
 
         skybox =  new Skybox(new String[]{
@@ -103,7 +119,7 @@ public class GameScene extends Scene{
            tickSun();
         }
         else if(KeyListener.get().isKeyPressed(263)){
-            if (distance > 3){
+            if (distance > 8){
                 distance --;
                 tickSun();
             }
@@ -160,7 +176,7 @@ public class GameScene extends Scene{
 
 
         glClearColor(.2f,.2f,.2f,1f);
-        glClear(GL_DEPTH_BUFFER_BIT);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
         glViewport(0,0,Window.get().width,Window.get().height);
 
@@ -200,10 +216,11 @@ public class GameScene extends Scene{
         Shaders.mainProgram.uploadMat4f("modelMatrix",dragon.getModelMatrix());
         Shaders.mainProgram.uploadInt("isTextured",1);
         Shaders.mainProgram.uploadInt("textureIMG",0);
-        marble.bind();
+
+        greenTile.bind();
 
         Shaders.mainProgram.uploadInt("albedo",0);
-        Shaders.mainProgram.uploadInt("normal",1);
+        Shaders.mainProgram.uploadInt("normalMap",1);
         Shaders.mainProgram.uploadInt("metallic",2);
         Shaders.mainProgram.uploadInt("roughness",3);
         Shaders.mainProgram.uploadInt("AO",4);
@@ -238,7 +255,7 @@ public class GameScene extends Scene{
     }
     @Override
     public void render() {
-        skyboxPass();
+//        skyboxPass();
         shadowPass();
         lightingPass();
         screenBuffer.render();

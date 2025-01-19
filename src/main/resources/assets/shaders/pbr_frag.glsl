@@ -1,4 +1,4 @@
-#version 420
+#version 420 core
 
 #define pi 3.1415926535897932384626433832795
 #define lightColor vec3(1.0)
@@ -20,7 +20,7 @@ struct PBRMaterial
 };
 
 uniform sampler2D albedo;
-uniform sampler2D normal;
+uniform sampler2D normalMap;
 uniform sampler2D metallic;
 uniform sampler2D roughness;
 uniform sampler2D AO;
@@ -35,10 +35,18 @@ uniform vec2 shadowMapDimensions;
 uniform vec3 cameraPos;
 
 
-in vec2 UV;
-in vec3 fragNormal;
+in mat3 TBN;
 in vec4 fragLightSpacePos;
+in vec3 fragNormal;
 in vec3 fragPos;
+in vec2 UV;
+
+
+//in mat3 tangentMatrix;
+//in vec3 fragNormal;
+//in vec2 UV;
+//in vec4 fragLightSpacePos;
+//in vec3 fragPos;
 
 out vec4 outColor;
 
@@ -90,13 +98,19 @@ vec3 fresnelSchlick(vec3 F0,float vDh){
     return ret;
 }
 
+vec3 calculateTBTNormals(){
+    vec3 normal = texture(normalMap, UV).rgb;
+    normal = normal * 2.0f - 1.0f;
+    return normalize(TBN*normal);
+}
 
 vec3 calculatePBRLighting(DirectionalLight light){
 
     vec3 radiance = light.color * light.intensity;
     vec3 baseReflectivity = mix(vec3(0.04),material.albedo,material.metallic);
 
-    vec3 N = normalize(fragNormal);
+    vec3 normal = calculateTBTNormals();
+    vec3 N = normalize(normal);
     vec3 V = normalize(cameraPos - fragPos);
     vec3 L = normalize(light.direction);
     vec3 H = normalize(V + L);
