@@ -33,17 +33,17 @@ public class Player {
 
 
         }
-        else if (KeyListener.get().isKeyPressed(83)){
+        if (KeyListener.get().isKeyPressed(83)){
             position.x -= cameraFront.x * speed;
             position.y -= cameraFront.y * speed;
             position.z -= cameraFront.z * speed;
         }
-        else if (KeyListener.get().isKeyPressed(68)){
+        if (KeyListener.get().isKeyPressed(68)){
             position.x -= cameraRight.x * speed;
             position.y -= cameraRight.y * speed;
             position.z -= cameraRight.z * speed;
         }
-        else if (KeyListener.get().isKeyPressed(65)){
+        if (KeyListener.get().isKeyPressed(65)){
             position.x += cameraRight.x * speed;
             position.y += cameraRight.y * speed;
             position.z += cameraRight.z * speed;

@@ -118,7 +118,7 @@ public static float[] loadModelFile(String filePath) {
     }catch(IOException e){
         throw new RuntimeException("Error writing to temp file",e);
     }
-    AIScene scene = Assimp.aiImportFile(tempFile.getAbsolutePath(),Assimp.aiProcess_GenSmoothNormals|Assimp.aiProcess_CalcTangentSpace);
+    AIScene scene = Assimp.aiImportFile(tempFile.getAbsolutePath(),Assimp.aiProcess_Triangulate | Assimp.aiProcess_GenSmoothNormals|Assimp.aiProcess_CalcTangentSpace);
     PointerBuffer buffer = scene.mMeshes();
     ArrayList<Float> vertexAttributesList = new ArrayList<Float>();
     for(int i = 0; i < buffer.limit(); i++){

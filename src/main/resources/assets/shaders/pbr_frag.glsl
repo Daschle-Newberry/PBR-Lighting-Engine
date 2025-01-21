@@ -1,22 +1,26 @@
 #version 420 core
 
+#define MAX_LIGHTS 4
 #define pi 3.1415926535897932384626433832795
-#define lightColor vec3(1.0)
 #define ambientStrength .03
 #define shadowFilterSize 16
-
-struct DirectionalLight
-{
-    vec3 color;
-    vec3 direction;
-    vec3 intensity;
-};
 
 struct PBRMaterial
 {
     float roughness;
     float metallic;
     vec3 albedo;
+};
+
+struct Light {
+    vec3 color;
+    vec3 positionDirection;
+    float intensity;
+    bool isDirectional;
+};
+
+struct Sun{
+    vec3 direction;
 };
 
 uniform sampler2D albedo;
@@ -28,9 +32,9 @@ uniform sampler2D AO;
 
 uniform sampler2D textureImg;
 uniform sampler2D shadowMap;
-uniform int isTextured;
 
-uniform DirectionalLight sun;
+
+uniform Light lights[MAX_LIGHTS];
 uniform vec2 shadowMapDimensions;
 uniform vec3 cameraPos;
 
@@ -42,16 +46,11 @@ in vec3 fragPos;
 in vec2 UV;
 
 
-//in mat3 tangentMatrix;
-//in vec3 fragNormal;
-//in vec2 UV;
-//in vec4 fragLightSpacePos;
-//in vec3 fragPos;
-
 out vec4 outColor;
 
 
 PBRMaterial material = PBRMaterial(texture(roughness,UV).r,texture(metallic,UV).r,texture(albedo,UV).rgb);
+Sun sun;
 
 float calcShadowFactor(){
     vec3 projCoords = fragLightSpacePos.xyz/fragLightSpacePos.w;
@@ -104,15 +103,26 @@ vec3 calculateTBTNormals(){
     return normalize(TBN*normal);
 }
 
-vec3 calculatePBRLighting(DirectionalLight light){
+float calculateAttenuationQuadratic(vec3 fragPos, vec3 lightPosition){
+    float distance = length(lightPosition - fragPos);
+    return 1.0/(distance*distance);
+}
 
-    vec3 radiance = light.color * light.intensity;
+vec3 calculatePBRLighting(Light light){
+
+
     vec3 baseReflectivity = mix(vec3(0.04),material.albedo,material.metallic);
+    vec3 lightDirection = light.positionDirection;
+    vec3 radiance = light.color * light.intensity;
+    if(!light.isDirectional){
+        lightDirection = light.positionDirection - fragPos;
+        radiance *= calculateAttenuationQuadratic(fragPos,light.positionDirection);
+    }
 
     vec3 normal = calculateTBTNormals();
     vec3 N = normalize(normal);
     vec3 V = normalize(cameraPos - fragPos);
-    vec3 L = normalize(light.direction);
+    vec3 L = normalize(lightDirection);
     vec3 H = normalize(V + L);
 
     float nDh = dot(N,H);
@@ -139,14 +149,17 @@ vec3 calculatePBRLighting(DirectionalLight light){
     return (kD * material.albedo/pi + specular) * radiance * nDl;
 
 
-
 }
 void main() {
     vec3 outputLum = vec3(0);
-    outputLum += calculatePBRLighting(sun);
+    for(int i = 0; i < MAX_LIGHTS; i++){
+        outputLum += calculatePBRLighting(lights[i]);
+    }
+
 
     outputLum = outputLum / (outputLum + vec3(1.0));
     outputLum = pow(outputLum,vec3(1.0/2.2));
 
-    outColor = vec4(outputLum,1.0);
+    float shadowFactor = calcShadowFactor();
+    outColor = vec4(shadowFactor * outputLum,1.0);
 }

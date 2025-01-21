@@ -112,6 +112,8 @@ public class ScreenBuffer {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D,textureColorBuffer);
         glDrawArrays(GL_TRIANGLES,0,6);
+
+
         Shaders.screenProgram.detach();
         glBindVertexArray(0);
     }

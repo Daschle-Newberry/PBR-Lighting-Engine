@@ -118,12 +118,12 @@ public class Camera {
     }
 
     public Vector3f getFrontVector(){
-        return this.cameraFront;
+        return this.cameraFront.normalize();
     }
 
     public Vector3f getRightVector(){
         Vector3f result = new Vector3f();
-        this.cameraUp.cross(this.cameraFront,result);
+        this.cameraUp.cross(this.cameraFront,result).normalize();
         return result;
     }
 

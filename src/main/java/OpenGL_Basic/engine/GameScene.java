@@ -1,10 +1,11 @@
 package OpenGL_Basic.engine;
 
+import OpenGL_Basic.engine.Emitters.DirectionalLight;
+import OpenGL_Basic.engine.Emitters.PointLight;
 import OpenGL_Basic.engine.input.KeyListener;
 import OpenGL_Basic.engine.input.MouseListener;
 import OpenGL_Basic.engine.postprocessing.ScreenBuffer;
 import OpenGL_Basic.engine.postprocessing.ShadowMap;
-import OpenGL_Basic.renderer.Shader;
 import OpenGL_Basic.renderer.Shaders;
 import org.joml.Vector3f;
 
@@ -12,16 +13,18 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class GameScene extends Scene{
     //Scene Elements
+    private int MAX_LIGHTS;
+    private PointLight pointLights[];
     private DirectionalLight sun;
-    private Model dragon,room,orb;
-    private Material rustedMetal,gold,futureMetal,greenTile;
+
+    private Model mainModel,room,orb;
+    private Material rustedMetal,gold,woodenWall,obsidian;
     private Camera camera;
 
     private Skybox skybox;
 
     //Gameplay Elements
     private Player player;
-
 
     //Rendering Elements
     private ScreenBuffer screenBuffer;
@@ -37,18 +40,27 @@ public class GameScene extends Scene{
     @Override
     public void init() {
         //Scene Elements
-        sun = new DirectionalLight(new Vector3f(0,0,distance),new Vector3f(0,0,1));
+        MAX_LIGHTS = 4;
+        pointLights = new PointLight[MAX_LIGHTS];
 
-        dragon = new Model("/assets/models/sphere.obj");
-        dragon.setScale(.2f);
-        dragon.setPosition(new Vector3f(0,0.2f,0));
-        dragon.setRotation(20,new Vector3f(0,1,0));
+        pointLights[0] = new PointLight(new Vector3f(-1.0f,-1.0f,1.0f),2.0f,new Vector3f(1.0f,1.0f,1.0f));
+        pointLights[1] = new PointLight(new Vector3f(1.0f,-1.0f,1.0f),2.0f,new Vector3f(1.0f,1.0f,1.0f));
+        pointLights[2] = new PointLight(new Vector3f(-1.0f,1.0f,1.0f),2.0f,new Vector3f(1.0f,1.0f,1.0f));
+        pointLights[3] = new PointLight(new Vector3f(1.0f,1.0f,1.0f),2.0f,new Vector3f(1.0f,1.0f,1.0f));
+
+        sun =  new DirectionalLight(new Vector3f(0.0f,.4f,1.0f), new Vector3f(0.0f,0.0f,1.0f));
+
+        mainModel = new Model("/assets/models/sphere.obj");
+        mainModel.setScale(.2f);
+
+
 
         room = new Model("/assets/models/room.obj");
         room.setScale(2f);
 
         orb =  new Model("/assets/models/sphere.obj");
         orb.setScale(.2f);
+
         rustedMetal = new Material(
                 "/assets/materials/rusted_iron/albedo.png",
                 "/assets/materials/rusted_iron/normal.png",
@@ -64,20 +76,19 @@ public class GameScene extends Scene{
                 "/assets/materials/gold/ao.png"
         );
 
-        futureMetal = new Material(
-                "/assets/materials/future_metal/futurism-metal_albedo.png",
-                "/assets/materials/future_metal/futurism-metal_normal-ogl.png",
-                "/assets/materials/future_metal/futurism-metal_metallic.png",
-                "/assets/materials/future_metal/futurism-metal_roughness.png",
-                "/assets/materials/future_metal/futurism-metal_ao.png"
+        woodenWall = new Material(
+                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_diffuse.jpg",
+                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_normal_opengl.jpg",
+                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_metallic.jpg",
+                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_roughness.jpg",
+                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_ao.jpg"
             );
-        greenTile = new Material(
-                "/assets/materials/green_tile/green-shower-tile1_albedo.png",
-                "/assets/materials/green_tile/green-shower-tile1_normal-ogl.png",
-                "/assets/materials/green_tile/green-shower-tile1_metallic.png",
-                "/assets/materials/green_tile/green-shower-tile1_roughness.png",
-                "/assets/materials/green_tile/green-shower-tile1_ao.png"
-        );
+        obsidian = new Material(
+                "/assets/materials/obsidian/obsidian_albedo.png",
+                "/assets/materials/obsidian/obsidian_normal-ogl.png",
+                "/assets/materials/obsidian/obsidian_metallic.png",
+                "/assets/materials/obsidian/obsidian_roughness.png",
+                "/assets/materials/obsidian/obsidian_ao.png");
         camera = new Camera(new Vector3f(0.0f,0.0f,0.0f),1);
 
         skybox =  new Skybox(new String[]{
@@ -108,53 +119,33 @@ public class GameScene extends Scene{
     public void update(double dt) {
         camera.processMouseMovement(MouseListener.getDx(),MouseListener.getDy());
         MouseListener.proccessMovement();
-
-
-        if (KeyListener.get().isKeyPressed(265)){
-           ticks++;
-           tickSun();
-        }
-        else if(KeyListener.get().isKeyPressed(264)){
-           ticks--;
-           tickSun();
-        }
-        else if(KeyListener.get().isKeyPressed(263)){
-            if (distance > 8){
-                distance --;
-                tickSun();
-            }
-        }
-        else if(KeyListener.get().isKeyPressed(262)){
-            distance ++;
-            tickSun();
-
-        }
-
-        orb.setPosition(sun.getPosition());
         player.updatePlayer();
-
-
-
         render();
     }
 
-    private void tickSun(){
-        sun.setLightPos(new Vector3f(0,distance *(float) Math.sin(ticks/50f),distance *(float) Math.cos(ticks/50f)));
-        sun.setLightFront(new Vector3f(0,(float) Math.sin(ticks/50f),(float) Math.cos(ticks/50f)));
-    }
 
     private void shadowPass(){
         shadowMap.bindToWrite();
         Shaders.shadowProgram.use();
-        glEnable(GL_DEPTH_TEST);
         glClear(GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
 
 
         Shaders.shadowProgram.uploadMat4f("projectionMatrix", shadowMap.getProjectionMatrix());
         Shaders.shadowProgram.uploadMat4f("viewMatrix", sun.getViewMatrix());
-        Shaders.shadowProgram.uploadMat4f("modelMatrix", dragon.getModelMatrix());
+        Shaders.shadowProgram.uploadMat4f("modelMatrix", mainModel.getModelMatrix());
 
-        dragon.render();
+        for (int x = -3; x < 1; x++){
+            for (int y = 1; y < 3; y++){
+                mainModel.setPosition(new Vector3f(x*3,y*3,0f));
+                Shaders.shadowProgram.uploadMat4f("modelMatrix",mainModel.getModelMatrix());
+                mainModel.render();
+
+            }
+        }
+
+        mainModel.render();
 
         Shaders.shadowProgram.uploadMat4f("modelMatrix", room.getModelMatrix());
 
@@ -169,33 +160,28 @@ public class GameScene extends Scene{
     private void lightingPass(){
         screenBuffer.bind();
         shadowMap.bindToRead();
-
-        glEnable(GL_DEPTH_TEST|GL_CULL_FACE);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
         glCullFace(GL_BACK);
 
-
         glClearColor(.2f,.2f,.2f,1f);
-        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
         glViewport(0,0,Window.get().width,Window.get().height);
 
-
-        Shaders.lightSourceProgram.use();
-
-        Shaders.lightSourceProgram.uploadMat4f("cameraViewMatrix",camera.getViewMatrix());
-        Shaders.lightSourceProgram.uploadMat4f("cameraProjectionMatrix",camera.getProjectionMatrix());
-        Shaders.lightSourceProgram.uploadMat4f("modelMatrix",orb.getModelMatrix());
-        orb.render();
 
         /// MAIN PASS///
 
         Shaders.mainProgram.use();
 
+        for(int i = 0; i < MAX_LIGHTS; i++){
+            Shaders.mainProgram.uploadVec3f("lights[" + i +"].color",pointLights[i].getColor());
+            Shaders.mainProgram.uploadFloat("lights[" + i +"].intensity",pointLights[i].getIntensity());
+            Shaders.mainProgram.uploadVec3f("lights[" + i +"].positionDirection",pointLights[i].getPosition());
+            Shaders.mainProgram.uploadInt("lights[" + i +"].isDirectional",0);
 
-        Shaders.mainProgram.uploadVec3f("sun.color",new Vector3f(1.0f));
-        Shaders.mainProgram.uploadVec3f("sun.intensity",new Vector3f(1f));
-        Shaders.mainProgram.uploadVec3f("sun.direction",sun.getLightFront());
+        }
 
 
         Shaders.mainProgram.uploadVec3f("cameraPos", camera.getCameraPosition());
@@ -205,19 +191,11 @@ public class GameScene extends Scene{
 
         Shaders.mainProgram.uploadMat4f("lightViewMatrix",sun.getViewMatrix());
         Shaders.mainProgram.uploadMat4f("lightProjectionMatrix",shadowMap.getProjectionMatrix());
+        Shaders.mainProgram.uploadVec3f("sun.direction",sun.getLightFront());
 
         Shaders.mainProgram.uploadVec2f("shadowMapDimensions",shadowMap.getMapDimensions());
-        Shaders.mainProgram.uploadInt("shadowMap",1);
+        Shaders.mainProgram.uploadInt("shadowMap",6);
 
-
-
-
-
-        Shaders.mainProgram.uploadMat4f("modelMatrix",dragon.getModelMatrix());
-        Shaders.mainProgram.uploadInt("isTextured",1);
-        Shaders.mainProgram.uploadInt("textureIMG",0);
-
-        greenTile.bind();
 
         Shaders.mainProgram.uploadInt("albedo",0);
         Shaders.mainProgram.uploadInt("normalMap",1);
@@ -226,15 +204,33 @@ public class GameScene extends Scene{
         Shaders.mainProgram.uploadInt("AO",4);
 
 
-        dragon.render();
+        for (int x = -3; x < 1; x++){
+            for (int y = 1; y < 3; y++){
+                mainModel.setPosition(new Vector3f(x*3,y*3,0f));
+                Shaders.mainProgram.uploadMat4f("modelMatrix",mainModel.getModelMatrix());
+                if (x == -3){
+                    woodenWall.bind();
+                }
+                else if (x == -2){
+                    rustedMetal.bind();
+                }
+                else if (x == -1){
+                    gold.bind();
+                }
+                else if(x == 0){
+                    obsidian.bind();
+                }
+                mainModel.render();
+
+            }
+        }
+
 
         Shaders.mainProgram.uploadMat4f("modelMatrix",room.getModelMatrix());
-        Shaders.mainProgram.uploadInt("isTextured",0);
+        obsidian.bind();
+        room.render();
 
-        Shaders.mainProgram.uploadFloat("material.roughness",1.0f);
-        Shaders.mainProgram.uploadVec3f("material.color",new Vector3f(0.0f,.4f,.4f));
-        Shaders.mainProgram.uploadInt("material.metallic",0);
-//        room.render();
+
 
         Shaders.mainProgram.detach();
         glBindVertexArray(0);
@@ -243,8 +239,9 @@ public class GameScene extends Scene{
 
     private void skyboxPass(){
         screenBuffer.bind();
-        glDepthMask(false);
+        glClear(GL_COLOR_BUFFER_BIT);
         glDisable(GL_CULL_FACE);
+        glDepthMask(false);
 
         Shaders.skyboxProgram.use();
         Shaders.skyboxProgram.uploadMat4f("cameraViewMatrix",camera.getViewMatrixNoTranslation());
@@ -255,7 +252,7 @@ public class GameScene extends Scene{
     }
     @Override
     public void render() {
-//        skyboxPass();
+        skyboxPass();
         shadowPass();
         lightingPass();
         screenBuffer.render();

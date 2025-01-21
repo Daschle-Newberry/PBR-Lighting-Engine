@@ -60,7 +60,7 @@ public class ShadowMap {
         glViewport(0,0,mapWidth,mapHeight);
     }
     public void bindToRead(){
-        glActiveTexture(GL_TEXTURE1);
+        glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D,shadowMap);
 
     }
