@@ -29,8 +29,6 @@ uniform sampler2D metallic;
 uniform sampler2D roughness;
 uniform sampler2D AO;
 
-
-uniform sampler2D textureImg;
 uniform sampler2D shadowMap;
 
 

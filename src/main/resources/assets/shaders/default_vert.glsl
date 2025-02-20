@@ -24,7 +24,7 @@ out vec2 UV;
 void main() {
     gl_Position = cameraProjectionMatrix * cameraViewMatrix * modelMatrix * vec4(aPos,1.0);
 
-    UV = aUV;
+    UV = vec2(aUV.s,-aUV.t);
     fragNormal = aNormals;
 
     vec3 T = normalize(vec3(modelMatrix * vec4(aTangents,0.0)));

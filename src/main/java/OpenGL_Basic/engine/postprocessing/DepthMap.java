@@ -2,8 +2,6 @@ package OpenGL_Basic.engine.postprocessing;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
-import org.joml.Vector2i;
-import org.joml.Vector3f;
 
 import java.nio.FloatBuffer;
 
@@ -11,13 +9,13 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL30.*;
 
-public class ShadowMap {
+public class DepthMap {
     private int mapWidth,mapHeight,FBO,shadowMap;
-    private Matrix4f shadowProjection;
+    private Matrix4f depthProjection;
 
 
 
-    public ShadowMap(int width, int height){
+    public DepthMap(int width, int height){
         FBO = glGenFramebuffers();
         shadowMap = glGenTextures();
         mapWidth = width;
@@ -40,20 +38,20 @@ public class ShadowMap {
         glReadBuffer(GL_NONE);
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
-            assert false : "Framebuffer Error: " + ShadowMap.class.getSimpleName();
+            assert false : "Framebuffer Error: " + DepthMap.class.getSimpleName();
 
         }
         glBindFramebuffer(GL_FRAMEBUFFER,0);
-        setShadowMapProjectionOrtho();
-
     }
 
-    public void setShadowMapProjectionOrtho(){
-        shadowProjection = new Matrix4f().identity();
-        shadowProjection.ortho(-5,5,-5,5,0.1f,20f);
+    public void setProjectionOrtho(){
+        depthProjection = new Matrix4f().identity();
+        depthProjection.ortho(-5,5,-5,5,0.1f,20f);
     }
 
-    public Matrix4f getProjectionMatrix(){return this.shadowProjection;}
+
+
+    public Matrix4f getProjectionMatrix(){return this.depthProjection;}
 
     public void bindToWrite(){
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER,FBO);

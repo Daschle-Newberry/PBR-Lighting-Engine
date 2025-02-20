@@ -6,6 +6,7 @@ public class Shaders {
     public static Shader shadowProgram;
     public static Shader lightSourceProgram;
     public static Shader skyboxProgram;
+    public static Shader edgeTestProgram;
 
     public static void loadShaders(){
 
@@ -23,5 +24,8 @@ public class Shaders {
 
         skyboxProgram =  new Shader("/assets/shaders/skybox_vert.glsl","/assets/shaders/skybox_frag.glsl");
         skyboxProgram.compile();
+
+        edgeTestProgram = new Shader("/assets/shaders/default_vert.glsl","/assets/shaders/test_frag.glsl");
+        edgeTestProgram.compile();
     }
 }

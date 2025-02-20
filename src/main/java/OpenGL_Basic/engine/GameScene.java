@@ -2,10 +2,9 @@ package OpenGL_Basic.engine;
 
 import OpenGL_Basic.engine.Emitters.DirectionalLight;
 import OpenGL_Basic.engine.Emitters.PointLight;
-import OpenGL_Basic.engine.input.KeyListener;
 import OpenGL_Basic.engine.input.MouseListener;
 import OpenGL_Basic.engine.postprocessing.ScreenBuffer;
-import OpenGL_Basic.engine.postprocessing.ShadowMap;
+import OpenGL_Basic.engine.postprocessing.DepthMap;
 import OpenGL_Basic.renderer.Shaders;
 import org.joml.Vector3f;
 
@@ -18,7 +17,7 @@ public class GameScene extends Scene{
     private DirectionalLight sun;
 
     private Model mainModel,room,orb;
-    private Material rustedMetal,gold,woodenWall,obsidian;
+    private Material rustedMetal,gold,sand,obsidian;
     private Camera camera;
 
     private Skybox skybox;
@@ -28,7 +27,7 @@ public class GameScene extends Scene{
 
     //Rendering Elements
     private ScreenBuffer screenBuffer;
-    private ShadowMap shadowMap;
+    private DepthMap shadowMap,edgeMap;
     private boolean renderTris;
 
 
@@ -50,7 +49,7 @@ public class GameScene extends Scene{
 
         sun =  new DirectionalLight(new Vector3f(0.0f,.4f,1.0f), new Vector3f(0.0f,0.0f,1.0f));
 
-        mainModel = new Model("/assets/models/sphere.obj");
+        mainModel = new Model("/assets/models/cube.obj");
         mainModel.setScale(.2f);
 
 
@@ -76,19 +75,22 @@ public class GameScene extends Scene{
                 "/assets/materials/gold/ao.png"
         );
 
-        woodenWall = new Material(
-                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_diffuse.jpg",
-                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_normal_opengl.jpg",
-                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_metallic.jpg",
-                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_roughness.jpg",
-                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_ao.jpg"
-            );
-        obsidian = new Material(
-                "/assets/materials/obsidian/obsidian_albedo.png",
-                "/assets/materials/obsidian/obsidian_normal-ogl.png",
-                "/assets/materials/obsidian/obsidian_metallic.png",
-                "/assets/materials/obsidian/obsidian_roughness.png",
-                "/assets/materials/obsidian/obsidian_ao.png");
+        sand =  new Material(
+                "/assets/materials/sand/sand-dunes1_albedo.png",
+                "/assets/materials/sand/sand-dunes1_normal-ogl.png",
+                "/assets/materials/sand/sand-dunes1_metallic.png",
+                "/assets/materials/sand/sand-dunes1_roughness.png",
+                "/assets/materials/sand/sand-dunes1_ao.png"
+        );
+//
+//        woodenWall = new Material(
+//                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_diffuse.jpg",
+//                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_normal_opengl.jpg",
+//                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_metallic.jpg",
+//                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_roughness.jpg",
+//                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_ao.jpg"
+//            );
+
         camera = new Camera(new Vector3f(0.0f,0.0f,0.0f),1);
 
         skybox =  new Skybox(new String[]{
@@ -104,8 +106,10 @@ public class GameScene extends Scene{
 
         //Render Elements
         screenBuffer = new ScreenBuffer();
-        shadowMap = new ShadowMap(2560,1440);
-        shadowMap.setShadowMapProjectionOrtho();
+        shadowMap = new DepthMap(2560,1440);
+        shadowMap.setProjectionOrtho();
+
+        edgeMap = new DepthMap(2560,1440);
         Shaders.loadShaders();
 
     }
@@ -153,8 +157,6 @@ public class GameScene extends Scene{
 
         Shaders.shadowProgram.detach();
         glBindVertexArray(0);
-
-
     }
 
     private void lightingPass(){
@@ -209,16 +211,16 @@ public class GameScene extends Scene{
                 mainModel.setPosition(new Vector3f(x*3,y*3,0f));
                 Shaders.mainProgram.uploadMat4f("modelMatrix",mainModel.getModelMatrix());
                 if (x == -3){
-                    woodenWall.bind();
+                    rustedMetal.bind();
                 }
                 else if (x == -2){
                     rustedMetal.bind();
                 }
                 else if (x == -1){
-                    gold.bind();
+                    sand.bind();
                 }
                 else if(x == 0){
-                    obsidian.bind();
+                    sand.bind();
                 }
                 mainModel.render();
 
@@ -227,7 +229,7 @@ public class GameScene extends Scene{
 
 
         Shaders.mainProgram.uploadMat4f("modelMatrix",room.getModelMatrix());
-        obsidian.bind();
+        sand.bind();
         room.render();
 
 
@@ -250,11 +252,46 @@ public class GameScene extends Scene{
         glDepthMask(true);
 
     }
+
+    private void depthPass(){
+        screenBuffer.bind();
+        Shaders.edgeTestProgram.use();
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+
+
+        Shaders.edgeTestProgram.uploadMat4f("cameraProjectionMatrix", camera.getProjectionMatrix());
+        Shaders.edgeTestProgram.uploadMat4f("cameraViewMatrix", camera.getViewMatrix());
+
+
+        for (int x = -3; x < 1; x++){
+            for (int y = 1; y < 3; y++){
+                mainModel.setPosition(new Vector3f(x*3,y*3,0f));
+                Shaders.edgeTestProgram.uploadMat4f("modelMatrix",mainModel.getModelMatrix());
+                mainModel.render();
+
+            }
+        }
+
+        mainModel.render();
+
+        Shaders.edgeTestProgram.uploadMat4f("modelMatrix", room.getModelMatrix());
+
+        room.render();
+
+        Shaders.edgeTestProgram.detach();
+        glBindVertexArray(0);
+
+    }
+    private void postProcessingPass(){
+
+        screenBuffer.render();
+    }
     @Override
     public void render() {
         skyboxPass();
-        shadowPass();
-        lightingPass();
+        depthPass();
         screenBuffer.render();
     }
 }
