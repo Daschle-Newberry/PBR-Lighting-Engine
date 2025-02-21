@@ -3,10 +3,13 @@ package OpenGL_Basic.engine;
 import OpenGL_Basic.engine.Emitters.DirectionalLight;
 import OpenGL_Basic.engine.Emitters.PointLight;
 import OpenGL_Basic.engine.input.MouseListener;
-import OpenGL_Basic.engine.postprocessing.ScreenBuffer;
-import OpenGL_Basic.engine.postprocessing.DepthMap;
+import OpenGL_Basic.renderer.Renderer;
+import OpenGL_Basic.renderer.buffers.ScreenBuffer;
+import OpenGL_Basic.renderer.buffers.DepthBuffer;
 import OpenGL_Basic.renderer.Shaders;
 import org.joml.Vector3f;
+
+import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL30.*;
 
@@ -27,17 +30,18 @@ public class GameScene extends Scene{
 
     //Rendering Elements
     private ScreenBuffer screenBuffer;
-    private DepthMap shadowMap,edgeMap;
+    private DepthBuffer shadowMap,edgeMap;
     private boolean renderTris;
 
 
-    //Misc
-    private int ticks;
-    private int distance = 8;
+    private Renderer renderer;
+
+
 
 
     @Override
     public void init() {
+
         //Scene Elements
         MAX_LIGHTS = 4;
         pointLights = new PointLight[MAX_LIGHTS];
@@ -49,23 +53,6 @@ public class GameScene extends Scene{
 
         sun =  new DirectionalLight(new Vector3f(0.0f,.4f,1.0f), new Vector3f(0.0f,0.0f,1.0f));
 
-        mainModel = new Model("/assets/models/cube.obj");
-        mainModel.setScale(.2f);
-
-
-
-        room = new Model("/assets/models/room.obj");
-        room.setScale(2f);
-
-        orb =  new Model("/assets/models/sphere.obj");
-        orb.setScale(.2f);
-
-        rustedMetal = new Material(
-                "/assets/materials/rusted_iron/albedo.png",
-                "/assets/materials/rusted_iron/normal.png",
-                "/assets/materials/rusted_iron/metallic.png",
-                "/assets/materials/rusted_iron/roughness.png",
-                "/assets/materials/rusted_iron/ao.png");
 
         gold = new Material(
                 "/assets/materials/gold/albedo.png",
@@ -82,14 +69,20 @@ public class GameScene extends Scene{
                 "/assets/materials/sand/sand-dunes1_roughness.png",
                 "/assets/materials/sand/sand-dunes1_ao.png"
         );
-//
-//        woodenWall = new Material(
-//                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_diffuse.jpg",
-//                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_normal_opengl.jpg",
-//                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_metallic.jpg",
-//                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_roughness.jpg",
-//                "/assets/materials/pattern_wooden_wall/patterned_wooden_wall_panel_48_28_ao.jpg"
-//            );
+
+        ArrayList<Model> models =  new ArrayList<>();
+
+        mainModel = new Model("/assets/models/cube.obj",gold);
+        mainModel.setScale(.2f);
+        mainModel.setPosition(new Vector3f(0.0f,1.0f,0.0f));
+
+        models.add(mainModel);
+
+
+
+        room = new Model("/assets/models/room.obj",sand);
+        room.setScale(2f);
+
 
         camera = new Camera(new Vector3f(0.0f,0.0f,0.0f),1);
 
@@ -106,11 +99,13 @@ public class GameScene extends Scene{
 
         //Render Elements
         screenBuffer = new ScreenBuffer();
-        shadowMap = new DepthMap(2560,1440);
+        shadowMap = new DepthBuffer(2560,1440);
         shadowMap.setProjectionOrtho();
 
-        edgeMap = new DepthMap(2560,1440);
+        edgeMap = new DepthBuffer(2560,1440);
         Shaders.loadShaders();
+
+        this.renderer = new Renderer(models,pointLights,sun,camera);
 
     }
 
@@ -127,171 +122,158 @@ public class GameScene extends Scene{
         render();
     }
 
+//    /// Skybox Rendering ///
+//    private void skyboxPass(){
+//        screenBuffer.bindWrite();
+//        glClear(GL_DEPTH_BUFFER_BIT);
+//        glDisable(GL_CULL_FACE);
+//
+//        Shaders.skyboxProgram.use();
+//        Shaders.skyboxProgram.uploadMat4f("cameraViewMatrix",camera.getViewMatrixNoTranslation());
+//        Shaders.skyboxProgram.uploadMat4f("cameraProjectionMatrix",camera.getProjectionMatrix());
+//        skybox.render();
+//
+//    }
+//
+//    /// Depth Writing ///
+//    private void shadowPass(){
+//        shadowMap.bindToWrite();
+//
+//        glClear(GL_DEPTH_BUFFER_BIT);
+//        glEnable(GL_DEPTH_TEST | GL_CULL_FACE);
+//
+//        Shaders.depthProgram.use();
+//
+//        Shaders.depthProgram.uploadMat4f("projectionMatrix", shadowMap.getProjectionMatrix());
+//        Shaders.depthProgram.uploadMat4f("viewMatrix", sun.getViewMatrix());
+//        Shaders.depthProgram.uploadMat4f("modelMatrix", mainModel.getModelMatrix());
+//
+//        sand.bind();
+//        Shaders.mainProgram.uploadMat4f("modelMatrix",mainModel.getModelMatrix());
+//        mainModel.render();
+//
+//
+//        Shaders.depthProgram.uploadMat4f("modelMatrix", room.getModelMatrix());
+//        room.render();
+//
+//        Shaders.depthProgram.detach();
+//        shadowMap.detach();
+//        glBindVertexArray(0);
+//    }
+//    private void depthPass(){
+//        edgeMap.bindToWrite();
+//
+//        glClear(GL_DEPTH_BUFFER_BIT);
+//        glEnable(GL_DEPTH_TEST);
+//        glEnable(GL_CULL_FACE);
+//
+//        Shaders.depthProgram.use();
+//
+//        Shaders.depthProgram.uploadMat4f("projectionMatrix", camera.getProjectionMatrix());
+//        Shaders.depthProgram.uploadMat4f("viewMatrix", camera.getViewMatrix());
+//
+//        Shaders.depthProgram.uploadMat4f("modelMatrix",mainModel.getModelMatrix());
+//        mainModel.render();
+//
+//
+//        Shaders.depthProgram.detach();
+//        edgeMap.detach();
+//        glBindVertexArray(0);
+//    }
+//
+//    /// Main Pass ///
+//
+//    private void lightingPass(){
+//        screenBuffer.bindWrite();
+//        glClear(GL_DEPTH_BUFFER_BIT);
+//        glEnable(GL_CULL_FACE | GL_DEPTH_TEST);
+//
+//        shadowMap.bindToRead();
+//
+//
+//        /// MAIN PASS///
+//
+//        Shaders.mainProgram.use();
+//
+//        for(int i = 0; i < MAX_LIGHTS; i++){
+//            Shaders.mainProgram.uploadVec3f("lights[" + i +"].color",pointLights[i].getColor());
+//            Shaders.mainProgram.uploadFloat("lights[" + i +"].intensity",pointLights[i].getIntensity());
+//            Shaders.mainProgram.uploadVec3f("lights[" + i +"].positionDirection",pointLights[i].getPosition());
+//            Shaders.mainProgram.uploadInt("lights[" + i +"].isDirectional",0);
+//
+//        }
+//
+//        Shaders.mainProgram.uploadMat4f("lightViewMatrix",sun.getViewMatrix());
+//        Shaders.mainProgram.uploadMat4f("lightProjectionMatrix",shadowMap.getProjectionMatrix());
+//        Shaders.mainProgram.uploadVec3f("sun.direction",sun.getLightFront());
+//
+//        Shaders.mainProgram.uploadVec3f("cameraPos", camera.getCameraPosition());
+//        Shaders.mainProgram.uploadMat4f("cameraViewMatrix",camera.getViewMatrix());
+//        Shaders.mainProgram.uploadMat4f("cameraProjectionMatrix",camera.getProjectionMatrix());
+//
+//
+//
+//        Shaders.mainProgram.uploadVec2f("shadowMapDimensions",shadowMap.getMapDimensions());
+//
+//
+//        Shaders.mainProgram.uploadInt("albedo",0);
+//        Shaders.mainProgram.uploadInt("normalMap",1);
+//        Shaders.mainProgram.uploadInt("metallic",2);
+//        Shaders.mainProgram.uploadInt("roughness",3);
+//        Shaders.mainProgram.uploadInt("AO",4);
+//        Shaders.mainProgram.uploadInt("shadowMap",6);
+//
+//
+//        gold.bind();
+//        Shaders.mainProgram.uploadMat4f("modelMatrix",mainModel.getModelMatrix());
+//        mainModel.render();
+//
+//        Shaders.mainProgram.uploadMat4f("modelMatrix",room.getModelMatrix());
+//        sand.bind();
+//        room.render();
+//
+//
+//
+//        Shaders.mainProgram.detach();
+//        glBindVertexArray(0);
+//
+//    }
+//
+//    /// Post Passes ///
+//    private void edgePass(){
+//        screenBuffer.bindWrite();
+//        glClear(GL_DEPTH_BUFFER_BIT);
+//        glEnable(GL_CULL_FACE | GL_DEPTH_TEST);
+//
+//        edgeMap.bindToRead();
+//
+//        Shaders.edgeTestProgram.use();
+//
+//        Shaders.edgeTestProgram.uploadMat4f("cameraProjectionMatrix", camera.getProjectionMatrix());
+//        Shaders.edgeTestProgram.uploadMat4f("cameraViewMatrix", camera.getViewMatrix());
+//
+//        Shaders.edgeTestProgram.uploadInt("depthMap",6);
+//        Shaders.edgeTestProgram.uploadVec2f("depthMapDimensions",edgeMap.getMapDimensions());
+//        Shaders.edgeTestProgram.uploadMat4f("modelMatrix",mainModel.getModelMatrix());
+//        mainModel.render();
+//
+//
+//        Shaders.edgeTestProgram.detach();
+//        glBindVertexArray(0);
+//    }
 
-    private void shadowPass(){
-        shadowMap.bindToWrite();
-        Shaders.shadowProgram.use();
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
-
-
-        Shaders.shadowProgram.uploadMat4f("projectionMatrix", shadowMap.getProjectionMatrix());
-        Shaders.shadowProgram.uploadMat4f("viewMatrix", sun.getViewMatrix());
-        Shaders.shadowProgram.uploadMat4f("modelMatrix", mainModel.getModelMatrix());
-
-        for (int x = -3; x < 1; x++){
-            for (int y = 1; y < 3; y++){
-                mainModel.setPosition(new Vector3f(x*3,y*3,0f));
-                Shaders.shadowProgram.uploadMat4f("modelMatrix",mainModel.getModelMatrix());
-                mainModel.render();
-
-            }
-        }
-
-        mainModel.render();
-
-        Shaders.shadowProgram.uploadMat4f("modelMatrix", room.getModelMatrix());
-
-        room.render();
-
-        Shaders.shadowProgram.detach();
-        glBindVertexArray(0);
-    }
-
-    private void lightingPass(){
-        screenBuffer.bind();
-        shadowMap.bindToRead();
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_CULL_FACE);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        glCullFace(GL_BACK);
-
-        glClearColor(.2f,.2f,.2f,1f);
-
-        glViewport(0,0,Window.get().width,Window.get().height);
-
-
-        /// MAIN PASS///
-
-        Shaders.mainProgram.use();
-
-        for(int i = 0; i < MAX_LIGHTS; i++){
-            Shaders.mainProgram.uploadVec3f("lights[" + i +"].color",pointLights[i].getColor());
-            Shaders.mainProgram.uploadFloat("lights[" + i +"].intensity",pointLights[i].getIntensity());
-            Shaders.mainProgram.uploadVec3f("lights[" + i +"].positionDirection",pointLights[i].getPosition());
-            Shaders.mainProgram.uploadInt("lights[" + i +"].isDirectional",0);
-
-        }
-
-
-        Shaders.mainProgram.uploadVec3f("cameraPos", camera.getCameraPosition());
-
-        Shaders.mainProgram.uploadMat4f("cameraViewMatrix",camera.getViewMatrix());
-        Shaders.mainProgram.uploadMat4f("cameraProjectionMatrix",camera.getProjectionMatrix());
-
-        Shaders.mainProgram.uploadMat4f("lightViewMatrix",sun.getViewMatrix());
-        Shaders.mainProgram.uploadMat4f("lightProjectionMatrix",shadowMap.getProjectionMatrix());
-        Shaders.mainProgram.uploadVec3f("sun.direction",sun.getLightFront());
-
-        Shaders.mainProgram.uploadVec2f("shadowMapDimensions",shadowMap.getMapDimensions());
-        Shaders.mainProgram.uploadInt("shadowMap",6);
-
-
-        Shaders.mainProgram.uploadInt("albedo",0);
-        Shaders.mainProgram.uploadInt("normalMap",1);
-        Shaders.mainProgram.uploadInt("metallic",2);
-        Shaders.mainProgram.uploadInt("roughness",3);
-        Shaders.mainProgram.uploadInt("AO",4);
-
-
-        for (int x = -3; x < 1; x++){
-            for (int y = 1; y < 3; y++){
-                mainModel.setPosition(new Vector3f(x*3,y*3,0f));
-                Shaders.mainProgram.uploadMat4f("modelMatrix",mainModel.getModelMatrix());
-                if (x == -3){
-                    rustedMetal.bind();
-                }
-                else if (x == -2){
-                    rustedMetal.bind();
-                }
-                else if (x == -1){
-                    sand.bind();
-                }
-                else if(x == 0){
-                    sand.bind();
-                }
-                mainModel.render();
-
-            }
-        }
-
-
-        Shaders.mainProgram.uploadMat4f("modelMatrix",room.getModelMatrix());
-        sand.bind();
-        room.render();
-
-
-
-        Shaders.mainProgram.detach();
-        glBindVertexArray(0);
-
-    }
-
-    private void skyboxPass(){
-        screenBuffer.bind();
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDisable(GL_CULL_FACE);
-        glDepthMask(false);
-
-        Shaders.skyboxProgram.use();
-        Shaders.skyboxProgram.uploadMat4f("cameraViewMatrix",camera.getViewMatrixNoTranslation());
-        Shaders.skyboxProgram.uploadMat4f("cameraProjectionMatrix",camera.getProjectionMatrix());
-        skybox.render();
-        glDepthMask(true);
-
-    }
-
-    private void depthPass(){
-        screenBuffer.bind();
-        Shaders.edgeTestProgram.use();
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
-
-
-        Shaders.edgeTestProgram.uploadMat4f("cameraProjectionMatrix", camera.getProjectionMatrix());
-        Shaders.edgeTestProgram.uploadMat4f("cameraViewMatrix", camera.getViewMatrix());
-
-
-        for (int x = -3; x < 1; x++){
-            for (int y = 1; y < 3; y++){
-                mainModel.setPosition(new Vector3f(x*3,y*3,0f));
-                Shaders.edgeTestProgram.uploadMat4f("modelMatrix",mainModel.getModelMatrix());
-                mainModel.render();
-
-            }
-        }
-
-        mainModel.render();
-
-        Shaders.edgeTestProgram.uploadMat4f("modelMatrix", room.getModelMatrix());
-
-        room.render();
-
-        Shaders.edgeTestProgram.detach();
-        glBindVertexArray(0);
-
-    }
-    private void postProcessingPass(){
-
-        screenBuffer.render();
-    }
     @Override
     public void render() {
-        skyboxPass();
-        depthPass();
-        screenBuffer.render();
+//        skyboxPass();
+//
+//        depthPass();
+//        shadowPass();
+//
+//        lightingPass();
+//        edgeMap.bindToRead();
+//        screenBuffer.render();
+
+        renderer.start();
+
     }
 }

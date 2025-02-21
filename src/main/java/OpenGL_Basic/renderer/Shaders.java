@@ -3,29 +3,25 @@ package OpenGL_Basic.renderer;
 public class Shaders {
     public static Shader mainProgram;
     public static Shader screenProgram;
-    public static Shader shadowProgram;
-    public static Shader lightSourceProgram;
+    public static Shader depthProgram;
     public static Shader skyboxProgram;
     public static Shader edgeTestProgram;
 
     public static void loadShaders(){
 
-        mainProgram = new Shader("/assets/shaders/default_vert.glsl","/assets/shaders/pbr_frag.glsl");
+        mainProgram = new Shader("/assets/shaders/default.vert", "/assets/shaders/default.frag");
         mainProgram.compile();
 
-        screenProgram =  new Shader("/assets/shaders/post_processing_vert.glsl","/assets/shaders/post_processing_frag.glsl");
+        screenProgram =  new Shader("/assets/shaders/screen.vert", "/assets/shaders/screen.frag");
         screenProgram.compile();
 
-        shadowProgram =  new Shader("/assets/shaders/shadow_map_vert.glsl","/assets/shaders/shadow_map_frag.glsl");
-        shadowProgram.compile();
+        depthProgram =  new Shader("/assets/shaders/depth.vert", "/assets/shaders/depth.frag");
+        depthProgram.compile();
 
-        lightSourceProgram =  new Shader("/assets/shaders/light_vert.glsl","/assets/shaders/light_frag.glsl");
-        lightSourceProgram.compile();
-
-        skyboxProgram =  new Shader("/assets/shaders/skybox_vert.glsl","/assets/shaders/skybox_frag.glsl");
+        skyboxProgram =  new Shader("/assets/shaders/skybox.vert", "/assets/shaders/skybox.frag");
         skyboxProgram.compile();
 
-        edgeTestProgram = new Shader("/assets/shaders/default_vert.glsl","/assets/shaders/test_frag.glsl");
+        edgeTestProgram = new Shader("/assets/shaders/edge.vert", "/assets/shaders/edge.frag");
         edgeTestProgram.compile();
     }
 }

@@ -1,4 +1,4 @@
-package OpenGL_Basic.engine.postprocessing;
+package OpenGL_Basic.renderer.buffers;
 
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -9,13 +9,13 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL30.*;
 
-public class DepthMap {
+public class DepthBuffer extends OutputBuffer{
     private int mapWidth,mapHeight,FBO,shadowMap;
     private Matrix4f depthProjection;
 
 
 
-    public DepthMap(int width, int height){
+    public DepthBuffer(int width, int height){
         FBO = glGenFramebuffers();
         shadowMap = glGenTextures();
         mapWidth = width;
@@ -38,7 +38,7 @@ public class DepthMap {
         glReadBuffer(GL_NONE);
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
-            assert false : "Framebuffer Error: " + DepthMap.class.getSimpleName();
+            assert false : "Framebuffer Error: " + DepthBuffer.class.getSimpleName();
 
         }
         glBindFramebuffer(GL_FRAMEBUFFER,0);
@@ -53,14 +53,21 @@ public class DepthMap {
 
     public Matrix4f getProjectionMatrix(){return this.depthProjection;}
 
+    @Override
     public void bindToWrite(){
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER,FBO);
         glViewport(0,0,mapWidth,mapHeight);
     }
+
+    @Override
     public void bindToRead(){
         glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D,shadowMap);
+    }
 
+    @Override
+    public void detach(){
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);
     }
 
     public Vector2f getMapDimensions(){

@@ -1,4 +1,4 @@
-package OpenGL_Basic.engine.postprocessing;
+package OpenGL_Basic.renderer.buffers;
 
 
 import OpenGL_Basic.engine.Window;
@@ -12,46 +12,12 @@ import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
-public class ScreenBuffer {
+public class ScreenBuffer extends OutputBuffer{
     public int FBO;
     private int RBO;
-
-    private int screenBufferVAO;
     private int textureColorBuffer;
-    private float[] quadVertices = {
-            // positions   // texCoords
-            -1.0f,  1.0f,  0.0f, 1.0f,
-            -1.0f, -1.0f,  0.0f, 0.0f,
-            1.0f, -1.0f,  1.0f, 0.0f,
 
-            -1.0f,  1.0f,  0.0f, 1.0f,
-            1.0f, -1.0f,  1.0f, 0.0f,
-            1.0f,  1.0f,  1.0f, 1.0f
-    };
-
-    private static int floatBytes = 4;
     public ScreenBuffer(){
-        screenBufferVAO  = glGenVertexArrays();
-        glBindVertexArray(screenBufferVAO);
-
-        FloatBuffer quadVertexBuffer = BufferUtils.createFloatBuffer(quadVertices.length);
-        quadVertexBuffer.put(quadVertices).flip();
-
-        //VBO
-        int quadVBO = glGenBuffers();
-
-        glBindBuffer(GL_ARRAY_BUFFER,quadVBO);
-
-        glBufferData(GL_ARRAY_BUFFER,quadVertexBuffer,GL_STATIC_DRAW);
-
-        // XYZ
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0,2,GL_FLOAT,false,4 * floatBytes,0);
-
-        // RGB
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1,2,GL_FLOAT,false,4 * floatBytes,2 * floatBytes);
-
         FBO = glGenFramebuffers();
         glBindFramebuffer(GL_FRAMEBUFFER,FBO);
 
@@ -98,28 +64,44 @@ public class ScreenBuffer {
         glViewport(0,0,width,height);
 
     }
-    public void render(){
-        glBindFramebuffer(GL_FRAMEBUFFER,0);
-        glViewport(0,0,Window.get().width,Window.get().height);
-        glPolygonMode(GL_FRONT, GL_FILL);
-
-        glDisable(GL_DEPTH_TEST);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-
-        glBindVertexArray(screenBufferVAO);
-        Shaders.screenProgram.use();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D,textureColorBuffer);
-        glDrawArrays(GL_TRIANGLES,0,6);
-
-
-        Shaders.screenProgram.detach();
-        glBindVertexArray(0);
-    }
-
-    public void bind(){
+//    public void render(){
+//        glBindFramebuffer(GL_FRAMEBUFFER,0);
+//        glViewport(0,0,Window.get().width,Window.get().height);
+//        glPolygonMode(GL_FRONT, GL_FILL);
+//
+//        glDisable(GL_DEPTH_TEST);
+//
+//        glClear(GL_COLOR_BUFFER_BIT);
+//
+//        glBindVertexArray(sc);
+//
+//        Shaders.screenProgram.use();
+//
+//        glActiveTexture(GL_TEXTURE0);
+//        glBindTexture(GL_TEXTURE_2D,textureColorBuffer);
+//
+//        Shaders.screenProgram.uploadInt("screenTexture",0);
+//
+//        glDrawArrays(GL_TRIANGLES,0,6);
+//
+//
+//        Shaders.screenProgram.detach();
+//        glBindVertexArray(0);
+//    }
+    @Override
+    public void bindToWrite(){
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER,FBO);
         glViewport(0,0,Window.get().width, Window.get().height);
     }
+    @Override
+    public void bindToRead(){
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D,textureColorBuffer);
+    }
+
+    @Override
+    public void detach(){
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);
+    }
+
 }
