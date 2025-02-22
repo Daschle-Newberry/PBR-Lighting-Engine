@@ -9,7 +9,7 @@ public class Shaders {
 
     public static void loadShaders(){
 
-        mainProgram = new Shader("/assets/shaders/default.vert", "/assets/shaders/default.frag");
+        mainProgram = new Shader("/assets/shaders/default.vert", "/assets/shaders/pbr.frag");
         mainProgram.compile();
 
         screenProgram =  new Shader("/assets/shaders/screen.vert", "/assets/shaders/screen.frag");
@@ -21,7 +21,7 @@ public class Shaders {
         skyboxProgram =  new Shader("/assets/shaders/skybox.vert", "/assets/shaders/skybox.frag");
         skyboxProgram.compile();
 
-        edgeTestProgram = new Shader("/assets/shaders/edge.vert", "/assets/shaders/edge.frag");
+        edgeTestProgram = new Shader("/assets/shaders/screen.vert", "/assets/shaders/edge.frag");
         edgeTestProgram.compile();
     }
 }

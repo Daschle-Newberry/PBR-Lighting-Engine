@@ -5,7 +5,7 @@ import org.joml.Matrix4f;
 
 import org.joml.Vector3f;
 
-public class Camera {
+public class Camera implements Perspective {
     private int type;
     private Matrix4f projectionMatrix,viewMatrix,globalScale;
 

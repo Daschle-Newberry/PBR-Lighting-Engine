@@ -48,7 +48,6 @@ public class Window {
             case 0:
                 currentScene = new GameScene();
                 currentScene.init();
-                glfwSetFramebufferSizeCallback(Window.get().glfwWindow, currentScene::framebufferSizeCallback);
 
                 break;
             default:

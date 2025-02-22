@@ -4,36 +4,38 @@ import OpenGL_Basic.engine.Camera;
 import OpenGL_Basic.engine.Emitters.DirectionalLight;
 import OpenGL_Basic.engine.Emitters.PointLight;
 import OpenGL_Basic.engine.Model;
-import OpenGL_Basic.renderer.RenderPass;
 import OpenGL_Basic.renderer.Renderer;
 import OpenGL_Basic.renderer.Shaders;
+import OpenGL_Basic.renderer.buffers.ColorBuffer;
 import OpenGL_Basic.renderer.buffers.DepthBuffer;
 import OpenGL_Basic.renderer.buffers.OutputBuffer;
 
 import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.*;
 
-public class PBRLightingPass extends RenderPass {
+public class PBRLightingPass implements RenderPass {
+    public static String[] dependencies = new String[]{"SceneLightDepth"};
+    private int renderShadows = 1;
     private Renderer renderer;
     private OutputBuffer outputBuffer;
     private DepthBuffer shadowMap;
 
-    public PBRLightingPass(Renderer renderer, OutputBuffer outputBuffer, DepthBuffer shadowMap){
+    public PBRLightingPass(Renderer renderer){
         this.renderer = renderer;
-        this.outputBuffer = outputBuffer;
-        this.shadowMap = shadowMap;
+        this.outputBuffer = renderer.outputs.get("RenderOutput");
     }
     @Override
     public void render() {
         outputBuffer.bindToWrite();
-        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-        glEnable(GL_CULL_FACE | GL_DEPTH_TEST);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
 
-//        shadowMap.bindToRead();
+        shadowMap.bindToRead();
 
-        ArrayList<Model> sceneObjects = renderer.renderQueue;
+        ArrayList<Model> sceneObjects = renderer.models;
         PointLight[] pointLights = renderer.pointLights;
         DirectionalLight sceneLight = renderer.sceneLight;
         Camera sceneCamera = renderer.sceneCamera;
@@ -42,7 +44,7 @@ public class PBRLightingPass extends RenderPass {
 
         Shaders.mainProgram.use();
 
-        for(int i = 0; i < renderer.MAX_LIGHTS; i++){
+        for(int i = 0; i < pointLights.length; i++){
             Shaders.mainProgram.uploadVec3f("lights[" + i +"].color",pointLights[i].getColor());
             Shaders.mainProgram.uploadFloat("lights[" + i +"].intensity",pointLights[i].getIntensity());
             Shaders.mainProgram.uploadVec3f("lights[" + i +"].positionDirection",pointLights[i].getPosition());
@@ -51,7 +53,7 @@ public class PBRLightingPass extends RenderPass {
         }
 
         Shaders.mainProgram.uploadMat4f("lightViewMatrix",sceneLight.getViewMatrix());
-//        Shaders.mainProgram.uploadMat4f("lightProjectionMatrix",shadowMap.getProjectionMatrix());
+        Shaders.mainProgram.uploadMat4f("lightProjectionMatrix",sceneLight.getProjectionMatrix());
         Shaders.mainProgram.uploadVec3f("sun.direction",sceneLight.getLightFront());
 
         Shaders.mainProgram.uploadVec3f("cameraPos", sceneCamera.getCameraPosition());
@@ -59,8 +61,8 @@ public class PBRLightingPass extends RenderPass {
         Shaders.mainProgram.uploadMat4f("cameraProjectionMatrix",sceneCamera.getProjectionMatrix());
 
 
-
-//        Shaders.mainProgram.uploadVec2f("shadowMapDimensions",shadowMap.getMapDimensions());
+        Shaders.mainProgram.uploadInt("renderShadows",renderShadows);
+        Shaders.mainProgram.uploadVec2f("shadowMapDimensions",shadowMap.getMapDimensions());
 
 
         Shaders.mainProgram.uploadInt("albedo",0);
@@ -79,6 +81,21 @@ public class PBRLightingPass extends RenderPass {
 
 
         Shaders.mainProgram.detach();
+        outputBuffer.detach();
+        shadowMap.detach();
         glBindVertexArray(0);
     }
+    @Override
+    public OutputBuffer getBuffer() {return this.outputBuffer;}
+
+    public String[] getDependencies() {
+        return dependencies;
+    }
+
+    @Override
+    public void sourceDependencies() {
+        this.shadowMap = (DepthBuffer) renderer.outputs.get("SceneLightDepth");
+    }
+
+
 }

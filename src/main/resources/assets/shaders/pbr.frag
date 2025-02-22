@@ -29,8 +29,8 @@ uniform sampler2D metallic;
 uniform sampler2D roughness;
 uniform sampler2D AO;
 
+uniform bool renderShadows;
 uniform sampler2D shadowMap;
-
 
 uniform Light lights[MAX_LIGHTS];
 uniform vec2 shadowMapDimensions;
@@ -149,6 +149,7 @@ vec3 calculatePBRLighting(Light light){
 
 }
 void main() {
+    
     vec3 outputLum = vec3(0);
     for(int i = 0; i < MAX_LIGHTS; i++){
         outputLum += calculatePBRLighting(lights[i]);
@@ -158,6 +159,11 @@ void main() {
     outputLum = outputLum / (outputLum + vec3(1.0));
     outputLum = pow(outputLum,vec3(1.0/2.2));
 
-    float shadowFactor = calcShadowFactor();
+    float shadowFactor;
+    if(renderShadows){
+        shadowFactor = calcShadowFactor();
+    }else{
+        shadowFactor = 1.0f;
+    }
     outColor = vec4(shadowFactor * outputLum,1.0);
 }

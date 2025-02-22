@@ -24,11 +24,9 @@ void main() {
     averageDepth /= 8;
 
     vec3 color;
-    if(abs(averageDepth - fragDepth) > .0001f){
-        color = vec3(1.0f);
+    if(abs(averageDepth - fragDepth) > .001f){
+        outColor = vec4(1.0f);
     }else{
-        color = vec3(0.0f);
+        discard;
     }
-
-    outColor = vec4(color,1.0f);
 }

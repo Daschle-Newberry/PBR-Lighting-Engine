@@ -181,10 +181,16 @@ public class Model{
                 vertexAttributesList.add(normals.y());
                 vertexAttributesList.add(normals.z());
 
-                AIVector3D tangents = tangentVectors.get(vertexIndex);
-                vertexAttributesList.add(tangents.x());
-                vertexAttributesList.add(tangents.y());
-                vertexAttributesList.add(tangents.z());
+                if(tangentVectors != null){
+                    AIVector3D tangents = tangentVectors.get(vertexIndex);
+                    vertexAttributesList.add(tangents.x());
+                    vertexAttributesList.add(tangents.y());
+                    vertexAttributesList.add(tangents.z());
+                }else{
+                    vertexAttributesList.add(0f);
+                    vertexAttributesList.add(0f);
+                    vertexAttributesList.add(0f);
+                }
 
 
 
