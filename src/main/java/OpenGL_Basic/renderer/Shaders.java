@@ -9,7 +9,7 @@ public class Shaders {
 
     public static void loadShaders(){
 
-        mainProgram = new Shader("/assets/shaders/default.vert", "/assets/shaders/default.frag");
+        mainProgram = new Shader("/assets/shaders/default.vert", "/assets/shaders/pbr.frag");
         mainProgram.compile();
 
         screenProgram =  new Shader("/assets/shaders/screen.vert", "/assets/shaders/screen.frag");

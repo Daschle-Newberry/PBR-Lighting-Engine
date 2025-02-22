@@ -51,15 +51,14 @@ public class GameScene extends Scene{
         pointLights[2] = new PointLight(new Vector3f(-1.0f,1.0f,1.0f),2.0f,new Vector3f(1.0f,1.0f,1.0f));
         pointLights[3] = new PointLight(new Vector3f(1.0f,1.0f,1.0f),2.0f,new Vector3f(1.0f,1.0f,1.0f));
 
-        sun =  new DirectionalLight(new Vector3f(0.0f,.4f,1.0f), new Vector3f(0.0f,0.0f,1.0f));
+        sun = new DirectionalLight(new Vector3f(0.0f,.4f,1.0f), new Vector3f(0.0f,0.0f,1.0f));
 
-
-        gold = new Material(
-                "/assets/materials/gold/albedo.png",
-                "/assets/materials/gold/normal.png",
-                "/assets/materials/gold/metallic.png",
-                "/assets/materials/gold/roughness.png",
-                "/assets/materials/gold/ao.png"
+        obsidian =  new Material(
+                "/assets/materials/obsidian/obsidian_albedo.png",
+                "/assets/materials/obsidian/obsidian_normal-ogl.png",
+                "/assets/materials/obsidian/obsidian_metallic.png",
+                "/assets/materials/obsidian/obsidian_roughness.png",
+                "/assets/materials/obsidian/obsidian_ao.png"
         );
 
         sand =  new Material(
@@ -72,16 +71,16 @@ public class GameScene extends Scene{
 
         ArrayList<Model> models =  new ArrayList<>();
 
-        mainModel = new Model("/assets/models/cube.obj",gold);
+        mainModel = new Model("/assets/models/cube.obj",obsidian);
         mainModel.setScale(.2f);
         mainModel.setPosition(new Vector3f(0.0f,1.0f,0.0f));
 
         models.add(mainModel);
 
-
-
         room = new Model("/assets/models/room.obj",sand);
         room.setScale(2f);
+
+        models.add(room);
 
 
         camera = new Camera(new Vector3f(0.0f,0.0f,0.0f),1);
@@ -99,8 +98,6 @@ public class GameScene extends Scene{
 
         //Render Elements
         screenBuffer = new ScreenBuffer();
-        shadowMap = new DepthBuffer(2560,1440);
-        shadowMap.setProjectionOrtho();
 
         edgeMap = new DepthBuffer(2560,1440);
         Shaders.loadShaders();
@@ -109,10 +106,6 @@ public class GameScene extends Scene{
 
     }
 
-    @Override
-    public void framebufferSizeCallback(long window, int width, int height) {
-        screenBuffer.framebufferSizeCallback(window,width,height);
-    }
 
     @Override
     public void update(double dt) {

@@ -7,6 +7,7 @@ import OpenGL_Basic.engine.Model;
 import OpenGL_Basic.renderer.buffers.DepthBuffer;
 import OpenGL_Basic.renderer.buffers.OutputBuffer;
 import OpenGL_Basic.renderer.buffers.ScreenBuffer;
+import OpenGL_Basic.renderer.passes.DepthPass;
 import OpenGL_Basic.renderer.passes.FinalPass;
 import OpenGL_Basic.renderer.passes.PBRLightingPass;
 
@@ -23,9 +24,9 @@ public class Renderer {
     private ScreenBuffer renderOutput;
     private DepthBuffer shadowMap,depthMap;
 
-    private RenderPass lightingPass, screenPass;
+    private RenderPass shadowPass,depthPass, lightingPass, screenPass;
 
-    public Renderer( ArrayList<Model> renderQueue, PointLight[] pointLights, DirectionalLight sceneLight, Camera sceneCamera ){
+    public Renderer(ArrayList<Model> renderQueue, PointLight[] pointLights, DirectionalLight sceneLight, Camera sceneCamera ){
         this.renderQueue = renderQueue;
         this.pointLights = pointLights;
         this.sceneLight = sceneLight;
@@ -33,8 +34,16 @@ public class Renderer {
 
         this.renderOutput = new ScreenBuffer();
 
+        shadowMap = new DepthBuffer(2560,1440);
+        shadowPass = new DepthPass(this,sceneLight,shadowMap);
+
+        depthMap = new DepthBuffer(2560,1440);
+        depthPass = new DepthPass(this,sceneCamera,depthMap);
+
         lightingPass = new PBRLightingPass(this,renderOutput,shadowMap);
         screenPass =  new FinalPass(renderOutput);
+
+        
     }
 
     public <T extends RenderPass> void addRenderPass(RenderPass pass){
@@ -42,6 +51,8 @@ public class Renderer {
     }
 
     public void start(){
+        shadowPass.render();
+        depthPass.render();
         lightingPass.render();
         screenPass.render();
     }

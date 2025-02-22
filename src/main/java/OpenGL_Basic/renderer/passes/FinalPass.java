@@ -1,4 +1,5 @@
 package OpenGL_Basic.renderer.passes;
+
 import OpenGL_Basic.engine.Window;
 import OpenGL_Basic.renderer.RenderPass;
 import OpenGL_Basic.renderer.Shaders;
@@ -16,11 +17,11 @@ import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public class FinalPass extends RenderPass {
-    private ScreenBuffer buffer;
+    private ScreenBuffer screenBuffer;
     private int screenQuad;
 
-    public FinalPass(ScreenBuffer buffer){
-        this.buffer = buffer;
+    public FinalPass(ScreenBuffer screenBuffer){
+        this.screenBuffer = screenBuffer;
         screenQuad  = glGenVertexArrays();
         glBindVertexArray(screenQuad);
 
@@ -44,16 +45,13 @@ public class FinalPass extends RenderPass {
     }
     @Override
     public void render() {
-        buffer.bindToRead();
+        screenBuffer.bindToRead();
         glBindFramebuffer(GL_FRAMEBUFFER,0);
         glViewport(0,0, Window.get().width,Window.get().height);
         glPolygonMode(GL_FRONT, GL_FILL);
         glDisable(GL_DEPTH_TEST);
 
-        glClear(GL_COLOR_BUFFER_BIT);
-
         Shaders.screenProgram.use();
-
 
         Shaders.screenProgram.uploadInt("screenTexture",0);
 
