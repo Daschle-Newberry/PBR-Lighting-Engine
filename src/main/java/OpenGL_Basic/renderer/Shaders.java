@@ -6,22 +6,30 @@ public class Shaders {
     public static Shader depthProgram;
     public static Shader skyboxProgram;
     public static Shader edgeTestProgram;
+    public static Shader debugProgram;
+    public static Shader gridProgram;
 
     public static void loadShaders(){
 
-        mainProgram = new Shader("/assets/shaders/default.vert", "/assets/shaders/pbr.frag");
-        mainProgram.compile();
+//        mainProgram = new Shader("/assets/shaders/pbr.vert", "/assets/shaders/pbr.frag");
+//        mainProgram.compile();
+//
+//        screenProgram =  new Shader("/assets/shaders/screen.vert", "/assets/shaders/screen.frag");
+//        screenProgram.compile();
+//
+//        depthProgram =  new Shader("/assets/shaders/depth.vert", "/assets/shaders/depth.frag");
+//        depthProgram.compile();
+//
+//        skyboxProgram =  new Shader("/assets/shaders/skybox.vert", "/assets/shaders/skybox.frag");
+//        skyboxProgram.compile();
+//
+//        edgeTestProgram = new Shader("/assets/shaders/screen.vert", "/assets/shaders/edge.frag");
+//        edgeTestProgram.compile();
 
-        screenProgram =  new Shader("/assets/shaders/screen.vert", "/assets/shaders/screen.frag");
-        screenProgram.compile();
+        debugProgram = new Shader("/assets/shaders/debug.vert","/assets/shaders/debug.frag");
+        debugProgram.compile();
 
-        depthProgram =  new Shader("/assets/shaders/depth.vert", "/assets/shaders/depth.frag");
-        depthProgram.compile();
-
-        skyboxProgram =  new Shader("/assets/shaders/skybox.vert", "/assets/shaders/skybox.frag");
-        skyboxProgram.compile();
-
-        edgeTestProgram = new Shader("/assets/shaders/screen.vert", "/assets/shaders/edge.frag");
-        edgeTestProgram.compile();
+//        gridProgram = new Shader("/assets/shaders/grid.vert","/assets/shaders/grid.frag");
+//        gridProgram.compile();
     }
 }

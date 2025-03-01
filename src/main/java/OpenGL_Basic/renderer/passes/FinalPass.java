@@ -3,27 +3,28 @@ package OpenGL_Basic.renderer.passes;
 import OpenGL_Basic.engine.Window;
 import OpenGL_Basic.renderer.Renderer;
 import OpenGL_Basic.renderer.Shaders;
-import OpenGL_Basic.renderer.buffers.ColorBuffer;
-import OpenGL_Basic.renderer.buffers.OutputBuffer;
+import OpenGL_Basic.renderer.buffers.RenderTarget;
+import OpenGL_Basic.renderer.buffers.Buffer;
 import OpenGL_Basic.util.Quad;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
 
+import static OpenGL_Basic.renderer.Renderer.R_OUTPUT_BUFFER;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
-public class FinalPass implements RenderPass {
-    private static String[] dependencies = null;
+public class FinalPass extends RenderPass {
+    private static int[] dependencies = null;
     private Renderer renderer;
-    private ColorBuffer screenBuffer;
+    private RenderTarget screenBuffer;
     private int screenQuad;
 
     public FinalPass(Renderer renderer){
         this.renderer = renderer;
-        this.screenBuffer = (ColorBuffer) renderer.outputs.get("RenderOutput");
+
         screenQuad  = glGenVertexArrays();
         glBindVertexArray(screenQuad);
 
@@ -72,15 +73,11 @@ public class FinalPass implements RenderPass {
         glBindVertexArray(0);
     }
     @Override
-    public OutputBuffer getBuffer() {return null;}
+    public Buffer getBuffer() {return null;}
 
-    public String[] getDependencies() {
+    public int[] getDependencies() {
         return dependencies;
     }
 
-    @Override
-    public void sourceDependencies() {
-
-    }
 
 }

@@ -1,5 +1,7 @@
 package OpenGL_Basic.renderer;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
@@ -8,25 +10,34 @@ import org.lwjgl.BufferUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 import static org.lwjgl.opengl.GL30.*;
 
 public class Shader {
+    private static ArrayList<String> usedColorTextures = new ArrayList<>();
+    private static ArrayList<String> usedDepthTextures = new ArrayList<>();
+
+    public boolean isCompiled = false;
     private int vertexID,fragmentID,shaderProgram;
     private String vertexShaderSrc,fragmentShaderSrc;
     private String vertex_path, fragment_path;
+
+    private UniformBlock uniforms;
+    private String[] outputBuffers;
 
     private FloatBuffer matBuffer = BufferUtils.createFloatBuffer(16);
     private FloatBuffer vec3fBuffer = BufferUtils.createFloatBuffer(3);
     private FloatBuffer vec2fBuffer = BufferUtils.createFloatBuffer(2);
 
+
     public Shader(String vert_path,String frag_path){
         vertex_path = vert_path;
         fragment_path = frag_path;
-
 
         InputStream vertexStream = Shaders.class.getResourceAsStream(vert_path);
 
@@ -38,7 +49,7 @@ public class Shader {
             vertexShaderSrc = new String(vertexStream.readAllBytes(), StandardCharsets.UTF_8);
         }catch(IOException e){
             e.printStackTrace();
-            assert false : "Error: Could not open file : '" + vert_path + "'";
+            throw new RuntimeException("Error: Could not open file : '" + vert_path + "'");
         }
 
 
@@ -48,12 +59,12 @@ public class Shader {
             fragmentShaderSrc = new String(fragmentStream.readAllBytes(), StandardCharsets.UTF_8);
         }catch(IOException e){
             e.printStackTrace();
-            assert false : "Error: Could not open file : '" + frag_path + "'";
+            throw new RuntimeException("Error: Could not open file : '" + frag_path + "'");
         }
 
         //Compile and link shaders
         //Vertex Shader
-        System.out.println("Compiling Vertex Shader");
+        System.out.println("Compiling Vertex Shader " + vertex_path);
         vertexID = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexID, vertexShaderSrc);
 
@@ -65,15 +76,14 @@ public class Shader {
 
         if (success == GL_FALSE) {
             int len = glGetShaderi(vertexID, GL_INFO_LOG_LENGTH);
-            System.out.println("Error: " + vertex_path + "\n\tVertex shader compiliation failed");
-            System.out.println(glGetShaderInfoLog(vertexID, len));
-
-            assert false : " ";
+            throw new RuntimeException("Error" + vertex_path +
+                    "\n\tVertex shader compiliation failed" +
+                    "\n" + glGetShaderInfoLog(vertexID, len));
         }
         System.out.println("Success");
 
         //Fragment Shader
-        System.out.println("Compiling Fragment Shader");
+        System.out.println("Compiling Fragment Shader " + fragment_path);
         fragmentID = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(fragmentID, fragmentShaderSrc);
 
@@ -85,12 +95,14 @@ public class Shader {
 
         if (success == GL_FALSE) {
             int len = glGetShaderi(fragmentID, GL_INFO_LOG_LENGTH);
-            System.out.println("Error: " + fragment_path + "\n\tFragment shader compiliation failed");
-            System.out.println(glGetShaderInfoLog(fragmentID, len));
 
-            assert false : " ";
+            throw new RuntimeException("Error " + fragment_path +
+                    "\n\tFragment shader compiliation failed" +
+                    "\n" + glGetShaderInfoLog(fragmentID, len));
         }
         System.out.println("Success");
+
+        uniforms = new UniformBlock();
     }
 
     public void compile(){
@@ -107,12 +119,18 @@ public class Shader {
         if (success == GL_FALSE) {
             int len = glGetProgrami(shaderProgram, GL_INFO_LOG_LENGTH);
 
-            System.out.println("Error: Program:\n\t" + vertex_path + "\n\t" + fragment_path +  "\n Shader compilation failed");
-            System.out.println(glGetProgramInfoLog(shaderProgram, len));
+            throw new RuntimeException("Error: Program:\n\t" +
+                    vertex_path +
+                    "\n\t" +
+                    fragment_path +
+                    "\n Shader compilation failed" +
+                    '\n' + glGetProgramInfoLog(shaderProgram, len));
 
-            assert false : " ";
         }
         System.out.println("Success");
+        getUniforms();
+        getRenderTargets();
+        isCompiled = true;
     }
 
     public void use(){
@@ -121,6 +139,84 @@ public class Shader {
     public void detach(){
         glUseProgram(0);
     }
+
+    public int getID(){return this.shaderProgram;}
+    public void getUniforms(){
+        IntBuffer totalUniforms = BufferUtils.createIntBuffer(1);
+        IntBuffer maxLength = BufferUtils.createIntBuffer(1);
+        glGetProgramiv(shaderProgram,GL_ACTIVE_UNIFORMS, totalUniforms);
+        glGetProgramiv(shaderProgram,GL_ACTIVE_UNIFORM_MAX_LENGTH, maxLength);
+
+        System.out.println(totalUniforms.get(0));
+
+        IntBuffer length = BufferUtils.createIntBuffer(1);
+        IntBuffer size = BufferUtils.createIntBuffer(1);
+        IntBuffer type = BufferUtils.createIntBuffer(1);
+        ByteBuffer name = BufferUtils.createByteBuffer(maxLength.get());
+
+
+        ArrayList<String> vec3Uniforms = new ArrayList<>();
+        ArrayList<String> mat4Uniforms = new ArrayList<>();
+        ArrayList<String> sampler2DUniforms = new ArrayList<>();
+        ArrayList<String> intUniforms = new ArrayList<>();
+        ArrayList<String> floatUniforms = new ArrayList<>();
+
+        for(int i = 0; i < totalUniforms.get(0); i++) {
+
+            glGetActiveUniform(shaderProgram,i,length,size,type,name);
+            String nameString = StandardCharsets.UTF_8.decode(name.slice(0,length.get(0))).toString();
+
+            if(nameString.equals("modelMatrix")) continue;
+
+            switch(type.get(0)){
+                case GL_FLOAT : floatUniforms.add(nameString);
+                                    break;
+                case GL_INT : intUniforms.add(nameString);
+                                    break;
+                case GL_SAMPLER_2D : sampler2DUniforms.add(nameString);
+                                    break;
+                case GL_FLOAT_MAT4 : mat4Uniforms.add(nameString);
+                                    break;
+                case GL_FLOAT_VEC3: vec3Uniforms.add(nameString);
+                                    break;
+                default : throw new RuntimeException("Unknown uniform type " + type.get(0) + " in program: \n" +
+                        vertex_path +
+                        "\n" +  fragment_path);
+            }
+
+        }
+
+        uniforms.vec3f = new String[vec3Uniforms.size()];
+        uniforms.mat4f = new String[mat4Uniforms.size()];
+        uniforms.sampler2D = new String[sampler2DUniforms.size()];
+        uniforms.Integer = new String[intUniforms.size()];
+        uniforms.Float = new String[floatUniforms.size()];
+
+        vec3Uniforms.toArray(uniforms.vec3f);
+        mat4Uniforms.toArray(uniforms.mat4f);
+        sampler2DUniforms.toArray(uniforms.sampler2D);
+        intUniforms.toArray(uniforms.Integer);
+        floatUniforms.toArray(uniforms.Float);
+    }
+    public void getRenderTargets(){
+
+        String regex = "/\\* RENDERTARGETS (.*?) \\*/";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(fragmentShaderSrc);
+
+        if(matcher.find()){
+            String targets = matcher.group(1);
+            outputBuffers = targets.split(", ");
+
+            for(String s : outputBuffers){
+                System.out.println(s);
+            }
+        }else{
+            outputBuffers = null;
+        }
+    }
+
+    public UniformBlock getUniformBlock(){return this.uniforms;}
 
     public void uploadMat4f(String varName, Matrix4f mat4){
         int location = glGetUniformLocation(this.shaderProgram,varName);

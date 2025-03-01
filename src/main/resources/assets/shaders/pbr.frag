@@ -160,10 +160,6 @@ void main() {
     outputLum = pow(outputLum,vec3(1.0/2.2));
 
     float shadowFactor;
-    if(renderShadows){
-        shadowFactor = calcShadowFactor();
-    }else{
-        shadowFactor = 1.0f;
-    }
+    shadowFactor = calcShadowFactor();
     outColor = vec4(shadowFactor * outputLum,1.0);
 }

@@ -19,6 +19,16 @@ public class DirectionalLight implements Perspective {
     }
 
     @Override
+    public float getNearPlane() {
+        return 0;
+    }
+
+    @Override
+    public float getFarPlane() {
+        return 0;
+    }
+
+    @Override
     public Matrix4f getViewMatrix(){
         this.viewMatrix.identity();
         this.viewMatrix = viewMatrix.lookAt(this.position,

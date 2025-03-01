@@ -4,9 +4,6 @@ import OpenGL_Basic.engine.Emitters.DirectionalLight;
 import OpenGL_Basic.engine.Emitters.PointLight;
 import OpenGL_Basic.engine.input.MouseListener;
 import OpenGL_Basic.renderer.Renderer;
-import OpenGL_Basic.renderer.buffers.ColorBuffer;
-import OpenGL_Basic.renderer.buffers.DepthBuffer;
-import OpenGL_Basic.renderer.Shaders;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -18,7 +15,7 @@ public class GameScene extends Scene{
     private PointLight pointLights[];
     private DirectionalLight sun;
 
-    private Model mainModel,room,orb;
+    private Model mainModel,room;
     private Material[] materials;
     private Camera camera;
 
@@ -26,13 +23,6 @@ public class GameScene extends Scene{
 
     //Gameplay Elements
     private Player player;
-
-    //Rendering Elements
-    private ColorBuffer screenBuffer;
-    private DepthBuffer shadowMap,edgeMap;
-    private boolean renderTris;
-
-
     private Renderer renderer;
 
 
@@ -50,27 +40,23 @@ public class GameScene extends Scene{
         pointLights[2] = new PointLight(new Vector3f(-1.0f,1.0f,1.0f),2.0f,new Vector3f(1.0f,1.0f,1.0f));
         pointLights[3] = new PointLight(new Vector3f(1.0f,1.0f,1.0f),2.0f,new Vector3f(1.0f,1.0f,1.0f));
 
-        sun = new DirectionalLight( new Vector3f(0.0f,10,100.0f),
+        sun = new DirectionalLight( new Vector3f(0.0f,10,5.0f),
                                     new Vector3f(0.0f,0.0f,1.0f),
-                                    new Matrix4f().ortho(-50,50,-50,50,0.1f,110));
+                                    new Matrix4f().ortho(-10,10,-10,10,0.1f,10));
 
 
 
         materials =  loadMaterials(new String[]{"sand","rusted_iron"});
 
-        materials = new Material[]{new Material("/assets/materials/cathedral/base_diff.jpg",null,null,null,null)};
-
         ArrayList<Model> models =  new ArrayList<>();
 
-        mainModel = new Model("/assets/models/combined02.obj",materials[0]);
-        mainModel.setScale(.004f);
+        mainModel = new Model("/assets/models/sphere.obj",materials[0]);
+        mainModel.setScale(.1f);
         mainModel.setPosition(new Vector3f(0.0f,2.0f,0.0f));
 
         models.add(mainModel);
 
-
-
-        camera = new Camera(new Vector3f(0.0f,0.0f,0.0f),1);
+        camera = new Camera(new Vector3f(0.0f,0.0f,0.0f));
 
         skybox =  new CubeMap(new String[]{
                         "/assets/skybox/right.jpg",

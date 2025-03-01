@@ -123,7 +123,7 @@ public class Window {
        glEnable(GL_MULTISAMPLE);
        glfwSetWindowSize(glfwWindow,this.width,this.height);
        glViewport(0,0,width,height);
-
+       glClearColor(.2f,.2f,.2f,1.0f);
 
         Window.changeScene(0);
     }

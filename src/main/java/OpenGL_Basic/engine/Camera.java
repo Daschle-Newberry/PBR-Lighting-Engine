@@ -6,32 +6,23 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public class Camera implements Perspective {
-    private int type;
+    private static float sensitivity = .1f;
+
     private Matrix4f projectionMatrix,viewMatrix,globalScale;
-
     private float pitch,yaw = 0.0f;
-
-    private float sensitivity = .1f;
-
     private Vector3f position;
-
-    private Vector3f heightOffset = new Vector3f(0.0f,2f,0.0f);
-
-
-    private float lookX;
-    private float lookY;
-    private float lookZ;
-
+    private float nearPlane, farPlane;
     private Vector3f cameraFront = new Vector3f(0.0f,0f,-1f);
     private Vector3f cameraUp = new Vector3f(0.0f,1.0f,0.0f);
 
 
-    public Camera(Vector3f position, int type){
+    public Camera(Vector3f position){
         this.position = position;
         this.projectionMatrix = new Matrix4f();
         this.viewMatrix = new Matrix4f();
         this.globalScale = new Matrix4f().scale(1.0f,1.0f,1.0f);
-        this.type = type;
+        this.nearPlane = .1f;
+        this.farPlane = 100.0f;
         adjustProjection();
 
     }
@@ -53,42 +44,22 @@ public class Camera implements Perspective {
             this.pitch = -89f;
         }
 
-        this.lookX = (float)(Math.cos(Math.toRadians(this.yaw)) * Math.cos(Math.toRadians(this.pitch)));
-        this.lookY = (float)(Math.sin(Math.toRadians(this.pitch)));
-        this.lookZ = (float)(Math.sin(Math.toRadians(this.yaw)) * Math.cos(Math.toRadians(this.pitch)));
+        float lookX = (float)(Math.cos(Math.toRadians(this.yaw)) * Math.cos(Math.toRadians(this.pitch)));
+        float lookY = (float)(Math.sin(Math.toRadians(this.pitch)));
+        float lookZ = (float)(Math.sin(Math.toRadians(this.yaw)) * Math.cos(Math.toRadians(this.pitch)));
 
-        this.cameraFront = new Vector3f(-this.lookX,this.lookY,this.lookZ).normalize();
+        this.cameraFront = new Vector3f(-lookX,lookY,lookZ).normalize();
 
     }
 
 
     public void adjustProjection(){
         projectionMatrix.identity();
-        projectionMatrix.perspective(45,(float) Window.get().width/Window.get().height,0.1f,1000.0f);
+        projectionMatrix.perspective(45,(float) Window.get().width/Window.get().height,nearPlane,farPlane);
     }
 
-    public void adjustScale(float factor){
-        Matrix4f factorMatrix = new Matrix4f().scale(factor,factor,factor);
 
-        this.globalScale.mul(factorMatrix);
-
-    }
-
-    public void setFrontVector(Vector3f front){
-        this.cameraFront = front;
-    }
-
-    public void setPosition(Vector3f position){this.position = position;}
-
-    public void setCameraup(Vector3f up){
-        this.cameraUp = up;
-    }
-
-    public void setProjectionMatrix(String type){
-        if(type == "ortho"){
-            this.projectionMatrix = new Matrix4f().ortho(-500,500,-500,500,0.1f,1000f);
-        }
-    }
+    @Override
     public Matrix4f getViewMatrix(){
         this.viewMatrix.identity();
         this.viewMatrix = viewMatrix.lookAt(this.position,
@@ -99,6 +70,7 @@ public class Camera implements Perspective {
 
     }
 
+    @Override
     public Matrix4f getViewMatrixNoTranslation(){
         this.viewMatrix.identity();
 
@@ -108,14 +80,17 @@ public class Camera implements Perspective {
     }
 
 
-
+    @Override
     public Matrix4f getProjectionMatrix(){
         return this.projectionMatrix;
     }
 
-    public Matrix4f getGlobalScale(){
-        return this.globalScale;
-    }
+
+    @Override
+    public float getNearPlane() {return  this.nearPlane;}
+
+    @Override
+    public float getFarPlane() {return  this.farPlane;}
 
     public Vector3f getFrontVector(){
         return this.cameraFront.normalize();

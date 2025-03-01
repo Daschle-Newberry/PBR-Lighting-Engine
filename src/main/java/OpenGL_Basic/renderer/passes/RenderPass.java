@@ -1,11 +1,9 @@
 package OpenGL_Basic.renderer.passes;
 
-import OpenGL_Basic.renderer.buffers.OutputBuffer;
+import OpenGL_Basic.renderer.buffers.Buffer;
 
-public interface RenderPass {
-    void render();
-    void sourceDependencies();
+public abstract class RenderPass {
+    public abstract void render();
 
-    String[] getDependencies();
-    OutputBuffer getBuffer();
+    public  abstract Buffer getBuffer();
 }

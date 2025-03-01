@@ -8,12 +8,12 @@ import java.nio.FloatBuffer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
 
-public class ColorBuffer extends OutputBuffer{
+public class RenderTarget implements Buffer {
     public int FBO;
     private int RBO;
     private int outputTexture;
 
-    public ColorBuffer(){
+    public RenderTarget(){
         FBO = glGenFramebuffers();
         glBindFramebuffer(GL_FRAMEBUFFER,FBO);
 

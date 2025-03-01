@@ -1,6 +1,5 @@
 package OpenGL_Basic.renderer.buffers;
 
-import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
 import java.nio.FloatBuffer;
@@ -9,7 +8,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL30.*;
 
-public class DepthBuffer extends OutputBuffer{
+public class DepthBuffer implements Buffer {
     private int mapWidth,mapHeight,FBO,outputTexture;
 
 

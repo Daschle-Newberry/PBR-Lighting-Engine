@@ -13,7 +13,6 @@ import static org.lwjgl.opengl.GL30.*;
 
 
 public class Material {
-    private static int textureCount;
     private int albedo,normal,metallic,roughness,AO;
     public Material(String albedo,String normal, String metallic, String roughness, String AO) {
 

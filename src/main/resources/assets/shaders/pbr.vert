@@ -18,9 +18,6 @@ out vec3 fragPos;
 out vec2 UV;
 
 
-
-
-
 void main() {
     gl_Position = cameraProjectionMatrix * cameraViewMatrix * modelMatrix * vec4(aPos,1.0);
 
