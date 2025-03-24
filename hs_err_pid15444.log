@@ -41,7 +41,7 @@ j  org.lwjgl.opengl.GL12C.glTexSubImage3D(IIIIIIIIIILjava/nio/FloatBuffer;)V+21
 j  org.lwjgl.opengl.GL12.glTexSubImage3D(IIIIIIIIIILjava/nio/FloatBuffer;)V+18
 j  OpenGL_Basic.engine.postprocessing.ShadowMapOffsetTexture.createShadowOffsetTexture(II)I+58
 j  OpenGL_Basic.engine.postprocessing.ShadowMap.<init>(II)V+216
-j  OpenGL_Basic.engine.GameScene.init()V+174
+j  OpenGL_Basic.engine.MainScene.init()V+174
 j  OpenGL_Basic.engine.Window.changeScene(I)V+33
 j  OpenGL_Basic.engine.Window.init()V+224
 j  OpenGL_Basic.engine.Window.run()V+15

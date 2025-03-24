@@ -1,27 +1,39 @@
 package OpenGL_Basic.renderer;
 
-import OpenGL_Basic.engine.Camera;
+import OpenGL_Basic.engine.gameobjects.Camera;
 import OpenGL_Basic.engine.CubeMap;
-import OpenGL_Basic.engine.Emitters.DirectionalLight;
-import OpenGL_Basic.engine.Emitters.PointLight;
+import OpenGL_Basic.engine.gameobjects.emitters.DirectionalLight;
+import OpenGL_Basic.engine.gameobjects.emitters.PointLight;
 import OpenGL_Basic.engine.Model;
-import OpenGL_Basic.renderer.buffers.RenderTarget;
-import OpenGL_Basic.renderer.buffers.Buffer;
+import OpenGL_Basic.renderer.buffers.Texture;
 import OpenGL_Basic.renderer.passes.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.*;
+
+import static org.lwjgl.opengl.GL11.*;
 
 public class Renderer {
-    public static final int R_OUTPUT_BUFFER = 0;
-    public static final int R_CAMERA_DEPTH_BUFFER = 1;
-    public static final int R_SCENELIGHT_DEPTH_BUFFER = 2;
+    public static final int B_NONE = -1;
     public static final int T_ALBEDO = 0;
     public static final int T_NORMAL = 1;
-    public static final int T_METALLIC = 2;
-    public static final int T_ROUGHNESS = 3;
-    public static final int T_AO = 4;
+    public static final int T_AO = 2;
+    public static final int T_METALLICORM = 3;
+    public static final int T_ROUGHNESS = 4;
+
+    public static final int B_IRRADIANCE_MAP = 5;
+    public static final int B_SPECULAR_MAP = 6;
+    public static final int B_BRDFLUT = 7;
+    public static final int B_COLORTEX0 = 8;
+    public static final int B_COLORTEX1 = 9;
+    public static final int B_COLORTEX2 = 10;
+    public static final int B_COLORTEX3 = 11;
+    public static final int B_COLORTEX4 = 12;
+    public static final int B_COLORTEX5 = 13;
+    public static final int B_DEPTHTEX0 = 14;
+    public static final int B_DEPTHTEX1 = 15;
+    public static final int B_DEPTHTEX2 = 16;
+    public static final int B_SHADOWMAP = 17;
+
 
     public ArrayList<Model> models;
     public PointLight[] pointLights;
@@ -30,59 +42,47 @@ public class Renderer {
     public CubeMap skybox;
 
 
-    public HashMap<String, Object> data = new HashMap<>();
+    public Map<Integer, Texture> buffers = new HashMap<>();
 
     private LinkedList<RenderPass> renderPasses =  new LinkedList<>();
-    private DebugLightingPass debugPass;
-    private RenderPass pass;
-    public Renderer(ArrayList<Model> models, PointLight[] pointLights, DirectionalLight sceneLight, Camera sceneCamera, CubeMap skyBox){
-        Shaders.loadShaders();
+    public Renderer(ArrayList<Model> models, PointLight[] pointLights, DirectionalLight sceneLight, Camera sceneCamera, CubeMap skyBox) {
         this.models = models;
         this.pointLights = pointLights;
         this.sceneLight = sceneLight;
         this.sceneCamera = sceneCamera;
         this.skybox = skyBox;
 
-        this.pass = new DebugLightingPass(this);
 
-        data.put("cameraViewMatrix",sceneCamera.getViewMatrix());
-        data.put("cameraProjectionMatrix",sceneCamera.getProjectionMatrix());
+        addPasses();
+
 
     }
+    private void addPasses() {
+        renderPasses.add(new DepthPass(this,sceneLight,B_SHADOWMAP));
+        renderPasses.add(new SkyboxPass(this,new int[]{B_COLORTEX0},B_NONE));
+        renderPasses.add(new PBRLightingPass(this,new int[]{B_COLORTEX0},B_DEPTHTEX0));
+        renderPasses.add(new FinalPass(this,new int[]{B_COLORTEX0},B_NONE));
 
-    public Object getData(String name) {
-        Object uniform = data.get(name);
-
-        if (uniform == null) throw new RuntimeException("Unknown uniform " + name);
-
+    }
+    public Texture getBuffer(int name) {
+        Texture uniform = buffers.get(name);
+        if(uniform == null) throw new RuntimeException("Unknown uniform " + name);
         return uniform;
     }
+
+    public Texture ensureColorBuffer(int type){
+        Texture buffer = buffers.computeIfAbsent(type, _ -> new Texture(GL_RGBA16, GL_RGBA,2560,1440,type));
+        return buffer;
+    }
+    public Texture ensureDepthBuffer(int type){
+        Texture buffer = buffers.computeIfAbsent(type, _ ->new Texture(GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT,2560,1440,type));
+        return buffer;
+    }
     public void start(){
-        pass.render();
+        for(RenderPass pass : renderPasses){
+            pass.render();
+        }
     }
 
 
 }
-//public void addPass(RenderPass pass){
-//    int[] dependencies = pass.getDependencies();
-//    if (dependencies != null){
-//        for(int dependency : dependencies) {
-//            addDependency(dependency);
-//        }
-//        pass.sourceDependencies();
-//    }
-//    renderPasses.add(pass);
-//}
-
-//private void addDependency(int dependency){
-//    if(dependency == R_CAMERA_DEPTH_BUFFER){
-//        RenderPass pass = new DepthPass(this,sceneCamera);
-//        addPass(pass);
-//        outputs.put(R_CAMERA_DEPTH_BUFFER,pass.getBuffer());
-//
-//    }else if(dependency == R_SCENELIGHT_DEPTH_BUFFER){
-//        RenderPass pass = new DepthPass(this,sceneLight);
-//        addPass(pass);
-//        outputs.put(R_SCENELIGHT_DEPTH_BUFFER,pass.getBuffer());
-//    }
-//}

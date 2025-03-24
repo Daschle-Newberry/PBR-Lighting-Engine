@@ -1,14 +1,12 @@
-#version 420 core
+#version 460
 
-/* RENDERTARGETS colortex0, colortex1, colortex2 */
+layout(location = 0) out vec4 outColor;
 
-uniform sampler2D color;
+uniform sampler2D albedo;
 
+in vec3 fragNormal;
 in vec2 UV;
-in vec3 normal;
 
-out vec4 outColor;
-
-void main() {
-    outColor = texture(color,UV);
+void main(){
+    outColor = vec4(pow(texture(albedo,UV).rgb,vec3(2.2)),1.0f);
 }

@@ -4,6 +4,8 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+!**/src/main/resources/assets/skybox
+
 ### IntelliJ IDEA ###
 .idea/modules.xml
 .idea/jarRepositories.xml
@@ -15,6 +17,7 @@ build/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+
 
 ### Eclipse ###
 .apt_generated
@@ -40,3 +43,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+/src/main/resources/assets/skybox/rogland_clear_night_8k.hdr
+/src/main/resources/assets/skybox/skybox.hdr
+/src/main/resources/assets/skybox/studio.hdr

@@ -11,6 +11,7 @@ import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_MULTISAMPLE;
+import static org.lwjgl.opengl.GL32C.GL_TEXTURE_CUBE_MAP_SEAMLESS;
 import static org.lwjgl.system.MemoryUtil.*;
 
 
@@ -46,7 +47,7 @@ public class Window {
     public static void changeScene(int newScene){
         switch (newScene){
             case 0:
-                currentScene = new GameScene();
+                currentScene = new MainScene();
                 currentScene.init();
 
                 break;
@@ -121,7 +122,9 @@ public class Window {
        glEnable(GL_DEPTH_TEST);
        glEnable(GL_CULL_FACE);
        glEnable(GL_MULTISAMPLE);
-       glfwSetWindowSize(glfwWindow,this.width,this.height);
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+        glfwSetWindowSize(glfwWindow,this.width,this.height);
        glViewport(0,0,width,height);
        glClearColor(.2f,.2f,.2f,1.0f);
 

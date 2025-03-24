@@ -73,6 +73,9 @@ public class Model{
     public void bindMaterial(){
         material.bind();
     }
+    public int getMaterialType(){
+        return material.getType();
+    }
 
     public Matrix4f getModelMatrix(){
             modelMatrix.identity();
@@ -121,7 +124,7 @@ public class Model{
         }catch(IOException e){
             throw new RuntimeException("Error writing to temp file",e);
         }
-        AIScene scene = Assimp.aiImportFile(tempFile.getAbsolutePath(),Assimp.aiProcess_Triangulate | Assimp.aiProcess_GenSmoothNormals|Assimp.aiProcess_CalcTangentSpace);
+        AIScene scene = Assimp.aiImportFile(tempFile.getAbsolutePath(), Assimp.aiProcess_CalcTangentSpace| Assimp.aiProcess_Triangulate);
         PointerBuffer buffer = scene.mMeshes();
         ArrayList<Float> vertexAttributesList = new ArrayList<Float>();
         for(int i = 0; i < buffer.limit(); i++){

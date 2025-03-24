@@ -2,28 +2,33 @@ package OpenGL_Basic.renderer.passes;
 
 import OpenGL_Basic.engine.Window;
 import OpenGL_Basic.renderer.Renderer;
+import OpenGL_Basic.renderer.Shader;
 import OpenGL_Basic.renderer.Shaders;
-import OpenGL_Basic.renderer.buffers.RenderTarget;
+import OpenGL_Basic.renderer.buffers.FrameBuffer;
 import OpenGL_Basic.renderer.buffers.Buffer;
+import OpenGL_Basic.renderer.buffers.Texture;
 import OpenGL_Basic.util.Quad;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
 
-import static OpenGL_Basic.renderer.Renderer.R_OUTPUT_BUFFER;
+import static OpenGL_Basic.renderer.Renderer.B_COLORTEX0;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public class FinalPass extends RenderPass {
-    private static int[] dependencies = null;
+    private static Shader shader = Shaders.screenProgram;
     private Renderer renderer;
-    private RenderTarget screenBuffer;
+    private FrameBuffer FBO;
+
     private int screenQuad;
 
-    public FinalPass(Renderer renderer){
+    public FinalPass(Renderer renderer,int[] colorBufferRequest,int depthBufferRequest){
+        if(!shader.isCompiled) shader.compile();
         this.renderer = renderer;
+        FBO = createFrameBuffer(colorBufferRequest,depthBufferRequest,renderer);
 
         screenQuad  = glGenVertexArrays();
         glBindVertexArray(screenQuad);
@@ -48,7 +53,6 @@ public class FinalPass extends RenderPass {
     }
     @Override
     public void render() {
-        screenBuffer.bindToRead();
         glBindFramebuffer(GL_FRAMEBUFFER,0);
         glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -57,27 +61,23 @@ public class FinalPass extends RenderPass {
         glPolygonMode(GL_FRONT, GL_FILL);
         glDisable(GL_DEPTH_TEST);
 
-        Shaders.screenProgram.use();
+        shader.use();
 
-        Shaders.screenProgram.uploadInt("screenTexture",0);
+        shader.uploadInt("colortex0",0);
+        renderer.getBuffer(B_COLORTEX0).bindTo(0);
 
         glBindVertexArray(screenQuad);
         glDrawArrays(GL_TRIANGLES,0,6);
 
-
-        screenBuffer.bindToWrite();
-        glClear(GL_COLOR_BUFFER_BIT);
-        glClear(GL_DEPTH_BUFFER_BIT);
-
-        Shaders.screenProgram.detach();
+        shader.detach();
         glBindVertexArray(0);
-    }
-    @Override
-    public Buffer getBuffer() {return null;}
 
-    public int[] getDependencies() {
-        return dependencies;
+        FBO.bindToWrite();
+        glClear(GL_COLOR_BUFFER_BIT);
+        FBO.detach();
     }
+
+
 
 
 }
