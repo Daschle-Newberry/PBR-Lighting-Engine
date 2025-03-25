@@ -13,18 +13,20 @@ public class Shaders {
     public static Shader irradianceConvolutionProgram;
     public static Shader specularConvolutionProgram;
     public static Shader precomputeBRDFProgram;
+    public static Shader probeProgram;
 
     public static void loadShaders(){
 
         debugProgram = new Shader("/assets/shaders/debug.vert","/assets/shaders/debug.frag");
         depthProgram = new Shader("/assets/shaders/depth.vert","/assets/shaders/depth.frag");
         skyboxProgram = new Shader("/assets/shaders/skybox.vert","/assets/shaders/skybox.frag");
-        PBRProgram = new Shader("/assets/shaders/pbr.vert","/assets/shaders/pbr.frag");
+        PBRProgram = new Shader("/assets/shaders/PBR/pbr.vert", "/assets/shaders/PBR/pbr.frag");
         screenProgram = new Shader("/assets/shaders/screen.vert","/assets/shaders/screen.frag");
-        cubeMappingProgram = new Shader("/assets/shaders/equirectToCube.vert","/assets/shaders/equirectToCube.frag");
-        irradianceConvolutionProgram = new Shader("/assets/shaders/equirectToCube.vert", "/assets/shaders/irradianceConvolution.frag");
-        specularConvolutionProgram = new Shader("/assets/shaders/equirectToCube.vert", "/assets/shaders/specularConvolution.frag");
-        precomputeBRDFProgram = new Shader("/assets/shaders/screen.vert","/assets/shaders/IntegrateBRDF.frag");
+        cubeMappingProgram = new Shader("/assets/shaders/MISC/equirectToCube.vert", "/assets/shaders/MISC/equirectToCube.frag");
+        irradianceConvolutionProgram = new Shader("/assets/shaders/MISC/equirectToCube.vert", "/assets/shaders/PBR/irradianceConvolution.frag");
+        specularConvolutionProgram = new Shader("/assets/shaders/MISC/equirectToCube.vert", "/assets/shaders/PBR/specularConvolution.frag");
+        precomputeBRDFProgram = new Shader("/assets/shaders/screen.vert", "/assets/shaders/PBR/IntegrateBRDF.frag");
+        probeProgram =  new Shader("/assets/shaders/probe.vert","/assets/shaders/probe.frag");
 
 
     }

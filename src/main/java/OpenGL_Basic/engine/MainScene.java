@@ -26,6 +26,7 @@ public class MainScene extends Scene{
     private Camera camera;
 
     private CubeMap skybox;
+    private ReflectionProbeGrid probeGrid;
 
     //Gameplay Elements
     private Player player;
@@ -51,42 +52,28 @@ public class MainScene extends Scene{
                 new Vector3f(0.0f,0.0f,-1.0f),
                 new Matrix4f().ortho(-2,2,-2,2,0.1f,10));
 
-
-
-        materials =  loadMaterials(new String[]{"plastic","grass","gold","rusted_iron"});
-
-        ArrayList<Model> models =  new ArrayList<>();
-
-        int MAX_MODELS = materials.length;
-        int materialIndex = 0;
-        for(int i = -MAX_MODELS/2; i < MAX_MODELS/2; i++){
-            Model model = new Model("/assets/models/sphere.obj",materials[materialIndex]);
-            model.setScale(.1f);
-            model.setPosition(new Vector3f(i * 2.0f,2.0f,0.0f));
-            models.add(model);
-            materialIndex ++;
-        }
-//      s
-
-//        room = new Model("/assets/models/room.obj",materials[1]);
-//        room.setScale(1f);
-//        room.setPosition(new Vector3f(0.0f,0.0f,0.0f));
-
-
-//        models.add(mainModel);
-//        models.add(room);
-
         camera = new Camera(new Vector3f(0.0f,0.0f,0.0f));
         gameObjects.add(camera);
 
+
+        materials =  loadMaterials(new String[]{"plastic","grass","gold","rusted_iron"});
+        ArrayList<Model> models =  new ArrayList<>();
+
+        Model model = new Model("/assets/models/dragon.obj",materials[2]);
+        model.setScale(.01f);
+        model.setPosition(new Vector3f(0.0f,2.0f,0.0f));
+        models.add(model);
+
+
         skybox =  new CubeMap("/assets/skybox/newport_loft.hdr");
+
+        probeGrid = new ReflectionProbeGrid(.2f,1);
 
         //Gameplay Elements
         player = new Player(new Vector3f(0,0,0),camera);
 
         //Render Elements
-        this.renderer = new Renderer(models,pointLights,sun,camera,skybox);
-
+        this.renderer = new Renderer(models,pointLights,sun,camera,skybox,probeGrid);
     }
 
     private Material[] loadMaterials(String[] materialNames){
