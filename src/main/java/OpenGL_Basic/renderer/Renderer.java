@@ -1,6 +1,7 @@
 package OpenGL_Basic.renderer;
 
 import OpenGL_Basic.engine.ReflectionProbeGrid;
+import OpenGL_Basic.engine.SceneData;
 import OpenGL_Basic.engine.gameobjects.Camera;
 import OpenGL_Basic.engine.CubeMap;
 import OpenGL_Basic.engine.gameobjects.emitters.DirectionalLight;
@@ -36,34 +37,23 @@ public class Renderer {
     public static final int B_SHADOWMAP = 17;
 
 
-    public ArrayList<Model> models;
-    public PointLight[] pointLights;
-    public DirectionalLight sceneLight;
-    public Camera sceneCamera;
-    public CubeMap skybox;
-    public ReflectionProbeGrid probeGrid;
+    public SceneData sceneData;
 
     public Map<Integer, Texture> buffers = new HashMap<>();
 
     private LinkedList<RenderPass> renderPasses =  new LinkedList<>();
-    public Renderer(ArrayList<Model> models, PointLight[] pointLights, DirectionalLight sceneLight, Camera sceneCamera, CubeMap skyBox, ReflectionProbeGrid probeGrid) {
-        this.models = models;
-        this.pointLights = pointLights;
-        this.sceneLight = sceneLight;
-        this.sceneCamera = sceneCamera;
-        this.skybox = skyBox;
-        this.probeGrid = probeGrid;
-
+    public Renderer(SceneData sceneData) {
+        this.sceneData = sceneData;
 
         addPasses();
 
 
     }
     private void addPasses() {
-        renderPasses.add(new DepthPass(this,sceneLight,B_SHADOWMAP));
-        renderPasses.add(new SkyboxPass(this,new int[]{B_COLORTEX0},B_NONE));
-        renderPasses.add(new ProbePass(this,new int[]{B_COLORTEX0},B_NONE));
-//        renderPasses.add(new PBRLightingPass(this,new int[]{B_COLORTEX0},B_DEPTHTEX0));
+        renderPasses.add(new DepthPass(this,sceneData, sceneData.sceneLight,B_SHADOWMAP));
+        renderPasses.add(new SkyboxPass(this,sceneData,new int[]{B_COLORTEX0},B_NONE));
+        renderPasses.add(new ProbePass(this, sceneData, new int[]{B_COLORTEX0},B_NONE));
+        renderPasses.add(new PBRLightingPass(this,sceneData,new int[]{B_COLORTEX0},B_DEPTHTEX0));
         renderPasses.add(new FinalPass(this,new int[]{B_COLORTEX0},B_NONE));
 
     }

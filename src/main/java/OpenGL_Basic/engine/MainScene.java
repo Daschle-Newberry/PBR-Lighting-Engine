@@ -17,20 +17,11 @@ import java.util.ArrayList;
 public class MainScene extends Scene{
     //Scene Elements
     private int MAX_LIGHTS;
-    private PointLight pointLights[];
-
-    private ArrayList<GameObject> gameObjects;
-    private DirectionalLight sun;
-    private Model mainModel,room;
-    private Material[] materials;
-    private Camera camera;
-
-    private CubeMap skybox;
-    private ReflectionProbeGrid probeGrid;
-
+    private SceneData sceneData;
     //Gameplay Elements
     private Player player;
     private Renderer renderer;
+    private ArrayList<GameObject> gameObjects;
 
 
 
@@ -38,42 +29,49 @@ public class MainScene extends Scene{
     @Override
     public void init() {
         Shaders.loadShaders();
+        sceneData = new SceneData();
         gameObjects = new ArrayList<>();
+        sceneData.models = new ArrayList<>();
+        sceneData.staticModels = new ArrayList<>();
         //Scene Elements
         MAX_LIGHTS = 4;
-        pointLights = new PointLight[MAX_LIGHTS];
+        sceneData.pointLights = new PointLight[MAX_LIGHTS];
 
-        pointLights[0] = new PointLight(new Vector3f(-1.0f,-1.0f,1.0f),2.0f,new Vector3f(1.0f,0.5f,0.5f));
-        pointLights[1] = new PointLight(new Vector3f(1.0f,-1.0f,1.0f),2.0f,new Vector3f(1.0f,0.5f,0.5f));
-        pointLights[2] = new PointLight(new Vector3f(-1.0f,1.0f,1.0f),2.0f,new Vector3f(1.0f,0.5f,0.5f));
-        pointLights[3] = new PointLight(new Vector3f(1.0f,1.0f,1.0f),2.0f,new Vector3f(1.0f,0.5f,0.5f));
+        sceneData.pointLights[0] = new PointLight(new Vector3f(-1.0f,-1.0f,1.0f),2.0f,new Vector3f(1.0f,0.5f,0.5f));
+        sceneData.pointLights[1] = new PointLight(new Vector3f(1.0f,-1.0f,1.0f),2.0f,new Vector3f(1.0f,0.5f,0.5f));
+        sceneData.pointLights[2] = new PointLight(new Vector3f(-1.0f,1.0f,1.0f),2.0f,new Vector3f(1.0f,0.5f,0.5f));
+        sceneData.pointLights[3] = new PointLight(new Vector3f(1.0f,1.0f,1.0f),2.0f,new Vector3f(1.0f,0.5f,0.5f));
 
-        sun = new DirectionalLight( new Vector3f(0.0f,1.0f,5.0f),
+        sceneData.sceneLight = new DirectionalLight( new Vector3f(0.0f,1.0f,5.0f),
                 new Vector3f(0.0f,0.0f,-1.0f),
                 new Matrix4f().ortho(-2,2,-2,2,0.1f,10));
 
-        camera = new Camera(new Vector3f(0.0f,0.0f,0.0f));
-        gameObjects.add(camera);
+        sceneData.camera = new Camera(new Vector3f(0.0f,0.0f,0.0f));
+        gameObjects.add(sceneData.camera);
 
 
-        materials =  loadMaterials(new String[]{"plastic","grass","gold","rusted_iron"});
+        Material[] materials =  loadMaterials(new String[]{"gold","sand"});
         ArrayList<Model> models =  new ArrayList<>();
 
-        Model model = new Model("/assets/models/dragon.obj",materials[2]);
-        model.setScale(.01f);
-        model.setPosition(new Vector3f(0.0f,2.0f,0.0f));
-        models.add(model);
+        Model model = new Model("/assets/models/dragon.obj",materials[0]);
+        model.setScale(.001f);
+        model.setPosition(new Vector3f(0.0f,0.0f,0.0f));
+        sceneData.models.add(model);
 
+        Model room = new Model("/assets/models/room.obj",materials[1]);
+        room.setPosition(new Vector3f(0.0f,-.5f,0.0f));
+        sceneData.models.add(room);
+        sceneData.staticModels.add(room);
 
-        skybox =  new CubeMap("/assets/skybox/newport_loft.hdr");
+        sceneData.skybox = new CubeMap("/assets/skybox/newport_loft.hdr");
 
-        probeGrid = new ReflectionProbeGrid(.2f,1);
+        sceneData.probeGrid = new ReflectionProbeGrid(.2f,1,sceneData);
 
         //Gameplay Elements
-        player = new Player(new Vector3f(0,0,0),camera);
+        player = new Player(new Vector3f(0,0,0),sceneData.camera);
 
         //Render Elements
-        this.renderer = new Renderer(models,pointLights,sun,camera,skybox,probeGrid);
+        this.renderer = new Renderer(sceneData);
     }
 
     private Material[] loadMaterials(String[] materialNames){
@@ -109,7 +107,7 @@ public class MainScene extends Scene{
         for(GameObject g : gameObjects){
             g.update();
         }
-        camera.processMouseMovement(MouseListener.getDx(),MouseListener.getDy());
+        sceneData.camera.processMouseMovement(MouseListener.getDx(),MouseListener.getDy());
         MouseListener.proccessMovement();
         player.updatePlayer();
         render();

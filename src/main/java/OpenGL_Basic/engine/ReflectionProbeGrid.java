@@ -22,7 +22,7 @@ public class ReflectionProbeGrid {
     private FloatBuffer instanceBuffer;
     private ReflectionProbe[] probes;
     public Matrix4f scale = new Matrix4f().scale(.1f);
-    public ReflectionProbeGrid(float padding,int size) {
+    public ReflectionProbeGrid(float padding,int size, SceneData sceneData) {
 
         probeCount = size * size * size;
 
@@ -48,8 +48,8 @@ public class ReflectionProbeGrid {
         for(int x = -size / 2; x <= size/2; x++){
             for(int y = -size / 2; y <= size/2; y++){
                 for(int z = -size / 2; z <= size/2; z++){
-                    Vector3f position = new Vector3f(x,y, z);
-                    probes[index] = new ReflectionProbe(position);
+                    Vector3f position = new Vector3f(x,-.2f, z);
+                    probes[index] = new ReflectionProbe(position, sceneData);
                     tmpBuffer[0] = position.x;
                     tmpBuffer[1] = position.y;
                     tmpBuffer[2] = position.z;
@@ -59,25 +59,30 @@ public class ReflectionProbeGrid {
             }
         }
 
+        update();
         glBufferData(GL_ARRAY_BUFFER,instanceBuffer.flip(),GL_STATIC_DRAW);
 
 
 
 
 
-        glBindBuffer(GL_ARRAY_BUFFER,0);
-
-
-        for(int i = 0; i < instanceBuffer.limit(); i++){
-            System.out.print(instanceBuffer.get(i) + " ");
-            if(i % 3 == 0 && i != 0){
-                System.out.println();
-            }
-        }
-
         glBindVertexArray(0);
     }
 
+    public void debugRender(){
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP,probes[0].environmentID);
+        glDrawArrays(GL_TRIANGLES,0,36);
+    }
+
+    public void debugBind(){
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_CUBE_MAP,probes[0].diffuseID);
+
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_CUBE_MAP,probes[0].specularID);
+
+    }
     public ReflectionProbe findNearestProbe(Vector3f position){
         float minDistance = 0;
         ReflectionProbe closestProbe = null;

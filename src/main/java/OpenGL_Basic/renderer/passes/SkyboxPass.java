@@ -1,5 +1,6 @@
 package OpenGL_Basic.renderer.passes;
 
+import OpenGL_Basic.engine.SceneData;
 import OpenGL_Basic.engine.gameobjects.Camera;
 import OpenGL_Basic.engine.CubeMap;
 import OpenGL_Basic.engine.gameobjects.Perspective;
@@ -16,10 +17,12 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 public class SkyboxPass extends RenderPass{
     private static Shader shader = Shaders.skyboxProgram;
     private Renderer renderer;
+    private SceneData sceneData;
     private FrameBuffer FBO;
-    public SkyboxPass(Renderer renderer, int[] colorBufferRequest, int depthBufferRequest) {
+    public SkyboxPass(Renderer renderer, SceneData sceneData, int[] colorBufferRequest, int depthBufferRequest) {
         if(!shader.isCompiled) shader.compile();
         this.renderer = renderer;
+        this.sceneData = sceneData;
         FBO = createFrameBuffer(colorBufferRequest,depthBufferRequest,renderer);
     }
 
@@ -31,11 +34,11 @@ public class SkyboxPass extends RenderPass{
 
         shader.use();
 
-        shader.uploadMat4f("cameraViewMatrix",renderer.sceneCamera.getViewMatrixNoTranslation());
-        shader.uploadMat4f("cameraProjectionMatrix",renderer.sceneCamera.getProjectionMatrix());
+        shader.uploadMat4f("cameraViewMatrix",sceneData.camera.getViewMatrixNoTranslation());
+        shader.uploadMat4f("cameraProjectionMatrix",sceneData.camera.getProjectionMatrix());
         shader.uploadInt("equirectangularMap",0);
 
-        renderer.skybox.render();
+        sceneData.skybox.render();
 
         FBO.detach();
         shader.detach();

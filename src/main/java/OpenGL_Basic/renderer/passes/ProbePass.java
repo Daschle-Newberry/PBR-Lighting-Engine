@@ -1,6 +1,7 @@
 package OpenGL_Basic.renderer.passes;
 
 import OpenGL_Basic.engine.Model;
+import OpenGL_Basic.engine.SceneData;
 import OpenGL_Basic.engine.Window;
 import OpenGL_Basic.renderer.Renderer;
 import OpenGL_Basic.renderer.Shader;
@@ -18,11 +19,13 @@ import static org.lwjgl.opengl.GL30.*;
 public class ProbePass extends RenderPass {
     private static Shader shader = Shaders.probeProgram;
     private Renderer renderer;
+    private SceneData sceneData;
     private FrameBuffer FBO;
 
-    public ProbePass(Renderer renderer, int[] colorBufferRequest, int depthBufferRequest) {
+    public ProbePass(Renderer renderer, SceneData sceneData, int[] colorBufferRequest, int depthBufferRequest) {
         if(!shader.isCompiled) shader.compile();
         this.renderer = renderer;
+        this.sceneData = sceneData;
         FBO = createFrameBuffer(colorBufferRequest,depthBufferRequest,renderer);
     }
 
@@ -34,10 +37,10 @@ public class ProbePass extends RenderPass {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
 
-        shader.uploadMat4f("projectionMatrix", renderer.sceneCamera.getProjectionMatrix());
-        shader.uploadMat4f("viewMatrix", renderer.sceneCamera.getViewMatrix());
-        shader.uploadMat4f("scaleMatrix", renderer.probeGrid.scale);
-        renderer.probeGrid.render();
+        shader.uploadMat4f("projectionMatrix", sceneData.camera.getProjectionMatrix());
+        shader.uploadMat4f("viewMatrix", sceneData.camera.getViewMatrix());
+        shader.uploadMat4f("scaleMatrix", sceneData.probeGrid.scale);
+        sceneData.probeGrid.render();
 
         FBO.detach();
         shader.detach();

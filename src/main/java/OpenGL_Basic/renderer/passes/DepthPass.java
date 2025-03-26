@@ -1,6 +1,7 @@
 package OpenGL_Basic.renderer.passes;
 
 import OpenGL_Basic.engine.Model;
+import OpenGL_Basic.engine.SceneData;
 import OpenGL_Basic.engine.gameobjects.Perspective;
 import OpenGL_Basic.renderer.Renderer;
 import OpenGL_Basic.renderer.Shader;
@@ -13,13 +14,13 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class DepthPass extends RenderPass {
     private static Shader shader = Shaders.depthProgram;
-    private Renderer renderer;
+    private SceneData sceneData;
     private FrameBuffer FBO;
     private Perspective perspective;
 
-    public DepthPass(Renderer renderer, Perspective perspective, int depthBufferRequest) {
+    public DepthPass(Renderer renderer, SceneData sceneData, Perspective perspective, int depthBufferRequest) {
         if(!shader.isCompiled) shader.compile();
-        this.renderer = renderer;
+        this.sceneData = sceneData;
         FBO = createFrameBuffer(null,depthBufferRequest,renderer);
         this.perspective = perspective;
     }
@@ -36,7 +37,7 @@ public class DepthPass extends RenderPass {
         shader.uploadMat4f("projectionMatrix", perspective.getProjectionMatrix());
         shader.uploadMat4f("viewMatrix",perspective.getViewMatrix());
 
-        for(Model model : renderer.models){
+        for(Model model : sceneData.models){
             shader.uploadMat4f("modelMatrix",model.getModelMatrix());
             model.render();
         }
