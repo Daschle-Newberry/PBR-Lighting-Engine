@@ -43,7 +43,7 @@ dependencies {
 
 
 shadowJar {
-    archiveBaseName.set('OpenGL_Outline')
+    archiveBaseName.set('PBREngine')
     archiveVersion.set('1.0.0')
     archiveClassifier.set('')
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -51,7 +51,7 @@ shadowJar {
 
 jar {
     manifest {
-        attributes 'Main-Class' : 'OpenGL_Basic.Main'
+        attributes 'Main-Class' : 'PBREngine.Main'
     }
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
