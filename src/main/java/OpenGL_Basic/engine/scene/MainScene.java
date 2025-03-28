@@ -37,7 +37,7 @@ public class MainScene extends Scene{
         gameObjects = new ArrayList<>();
         sceneData.models = new ArrayList<>();
         sceneData.staticModels = new ArrayList<>();
-        sceneData.probeGrid = new ReflectionProbeGrid(new Vector3f(0.0f,0.0f,0.0f), new Vector3f(.8f,.3f,.8f),1,sceneData);
+        sceneData.probeGrid = new ReflectionProbeGrid(new Vector3f(0.0f,.5f,0.0f), new Vector3f(.8f,.3f,.8f),3,sceneData);
 
 
         //Scene Elements
@@ -58,51 +58,30 @@ public class MainScene extends Scene{
 
         sceneData.skybox = new CubeMap("/assets/skybox/newport_loft.hdr");
 
-//        Model room = new Model("/assets/models/room.obj","/assets/materials/sand");
-//        room.setPosition(new Vector3f(0.0f,0.0f,0.0f));
-//        room.setEnvironmentMap(sceneData.skybox);
-//        sceneData.models.add(room);
-//        sceneData.staticModels.add(room);
+        Model room = new Model("/assets/models/room.obj","/assets/materials/sand");
+        room.setPosition(new Vector3f(0.0f,0.0f,0.0f));
+        room.setEnvironmentMap(sceneData.skybox);
+        sceneData.models.add(room);
+        sceneData.staticModels.add(room);
 
-        Model model = new Model("/assets/models/cube.obj","/assets/materials/gold");
+        Model model = new Model("/assets/models/sphere.obj","/assets/materials/veined_marble");
         model.setScale(.25f);
-        model.setPosition(new Vector3f(.5f,0.0f,0.0f));
-        model.setEnvironmentMap(sceneData.skybox);
-        sceneData.staticModels.add(model);
+        model.setPosition(new Vector3f(0.0f,0.0f,0.0f));
+        model.setEnvironmentMap(sceneData.probeGrid.findNearestProbe(new Vector3f(0.0f,0.0f,0.0f)).getCubeMap());
         sceneData.models.add(model);
 
-        Model model2 = new Model("/assets/models/cube.obj","/assets/materials/gold");
+
+        Model model2 = new Model("/assets/models/sphere.obj","/assets/materials/veined_marble");
         model2.setScale(.25f);
-        model2.setPosition(new Vector3f(1.5f,0.0f,0.0f));
-        model2.setEnvironmentMap(sceneData.skybox);
-        sceneData.staticModels.add(model2);
+        model2.setPosition(new Vector3f(-.5f,0.0f,0.0f));
+        model2.setEnvironmentMap(sceneData.probeGrid.findNearestProbe(new Vector3f(-0.5f,0.0f,0.0f)).getCubeMap());
         sceneData.models.add(model2);
 
-        Model model3 = new Model("/assets/models/cube.obj","/assets/materials/jade");
+        Model model3 = new Model("/assets/models/sphere.obj","/assets/materials/gold");
         model3.setScale(.25f);
-        model3.setPosition(new Vector3f(1.0f,0.5f,0.0f));
-        model3.setEnvironmentMap(sceneData.skybox);
-        sceneData.staticModels.add(model3);
+        model3.setPosition(new Vector3f(.5f,0.0f,0.0f));
+        model3.setEnvironmentMap(sceneData.probeGrid.findNearestProbe(new Vector3f(.5f,0.0f,0.0f)).getCubeMap());
         sceneData.models.add(model3);
-
-        Model model4 = new Model("/assets/models/cube.obj","/assets/materials/jade");
-        model4.setScale(.25f);
-        model4.setPosition(new Vector3f(1.0f,-0.5f,0.0f));
-        model4.setEnvironmentMap(sceneData.skybox);
-        sceneData.staticModels.add(model4);
-        sceneData.models.add(model4);
-
-//        Model model2 = new Model("/assets/models/sphere.obj","/assets/materials/plastic");
-//        model2.setScale(.25f);
-//        model2.setPosition(new Vector3f(-.5f,0.0f,0.0f));
-//        model2.setEnvironmentMap(sceneData.probeGrid.findNearestProbe(new Vector3f(-1.0f,0.0f,0.0f)).getCubeMap());
-//        sceneData.models.add(model2);
-//
-//        Model model3 = new Model("/assets/models/sphere.obj","/assets/materials/jade");
-//        model3.setScale(.25f);
-//        model3.setPosition(new Vector3f(.5f,0.0f,0.0f));
-//        model3.setEnvironmentMap(sceneData.probeGrid.findNearestProbe(new Vector3f(-1.0f,0.0f,0.0f)).getCubeMap());
-//        sceneData.models.add(model3);
 
 
         sceneData.probeGrid.update();

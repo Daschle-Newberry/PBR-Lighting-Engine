@@ -49,9 +49,7 @@ public class ReflectionProbeGrid {
         for(int x = -density / 2; x <= density/2; x++){
             for(int y = -density / 2; y <= density/2; y++){
                 for(int z = -density / 2; z <= density/2; z++){
-//                    Vector3f position = new Vector3f(center.x + x * dimensions.x, center.y + y * dimensions.y, center.z + z * dimensions.z);
-                    Vector3f position = new Vector3f(1.0f,0.0f,0.0f);
-
+                    Vector3f position = new Vector3f(center.x + x * dimensions.x, center.y + y * dimensions.y, center.z + z * dimensions.z);
                     probes[index] = new ReflectionProbe(position, sceneData);
                     tmpBuffer[0] = position.x;
                     tmpBuffer[1] = position.y;

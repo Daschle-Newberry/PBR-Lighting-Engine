@@ -16,5 +16,5 @@ vec2 sampleSphericalMap(vec3 v){
 
 void main() {
     vec2 UV = sampleSphericalMap(normalize(localPos));
-    outColor = vec4(texture(equirectangularMap,UV));
+    outColor = vec4(texture(equirectangularMap,UV).rgb,1.0);
 }

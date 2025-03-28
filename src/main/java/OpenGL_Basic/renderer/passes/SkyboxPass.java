@@ -35,7 +35,7 @@ public class SkyboxPass extends RenderPass{
         shader.uploadMat4f("cameraProjectionMatrix",sceneData.camera.getProjectionMatrix());
         shader.uploadInt("equirectangularMap",0);
 
-        sceneData.probeGrid.debugBindToSkybox();
+        sceneData.skybox.render();
 
         FBO.detach();
         shader.detach();

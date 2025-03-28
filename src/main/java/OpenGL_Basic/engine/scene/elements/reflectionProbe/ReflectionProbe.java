@@ -32,12 +32,12 @@ public class ReflectionProbe {
         int cubeHeight = 512;
 
         Matrix4f[] views = new Matrix4f[]{
-                new Matrix4f().lookAt(position, new Vector3f(1.0f, 0.0f, 0.0f), new Vector3f(0.0f, -1.0f, 0.0f)),
-                new Matrix4f().lookAt(position, new Vector3f(-1.0f, 0.0f, 0.0f), new Vector3f(0.0f, -1.0f, 0.0f)),
-                new Matrix4f().lookAt(position, new Vector3f(0.0f, 1.0f, 0.0f), new Vector3f(0.0f, 0.0f, 1.0f)),
-                new Matrix4f().lookAt(position, new Vector3f(0.0f, -1.0f, 0.0f), new Vector3f(0.0f, 0.0f, -1.0f)),
-                new Matrix4f().lookAt(position, new Vector3f(0.0f, 0.0f, 1.0f), new Vector3f(0.0f, -1.0f, 0.0f)),
-                new Matrix4f().lookAt(position, new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, -1.0f, 0.0f))
+                new Matrix4f().lookAt(position, new Vector3f(position.x + 1.0f, position.y + 0.0f, position.z + 0.0f), new Vector3f(0.0f, -1.0f, 0.0f)),
+                new Matrix4f().lookAt(position, new Vector3f(position.x + -1.0f, position.y + 0.0f, position.z + 0.0f), new Vector3f(0.0f, -1.0f, 0.0f)),
+                new Matrix4f().lookAt(position, new Vector3f(position.x + 0.0f, position.y +  1.0f, position.z + 0.0f), new Vector3f(0.0f, 0.0f, 1.0f)),
+                new Matrix4f().lookAt(position, new Vector3f(position.x + 0.0f, position.y + -1.0f, position.z + 0.0f), new Vector3f(0.0f, 0.0f, -1.0f)),
+                new Matrix4f().lookAt(position, new Vector3f(position.x + 0.0f, position.y + 0.0f, position.z + 1.0f), new Vector3f(0.0f, -1.0f, 0.0f)),
+                new Matrix4f().lookAt(position, new Vector3f(position.x + 0.0f, position.y + 0.0f, position.z + -1.0f), new Vector3f(0.0f, -1.0f, 0.0f))
         };
 
         int FBO = glGenFramebuffers();
@@ -54,7 +54,7 @@ public class ReflectionProbe {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         if (!Shaders.skyboxProgram.isCompiled) Shaders.skyboxProgram.compile();
-        if(!Shaders.debugProgram.isCompiled) Shaders.debugProgram.compile();
+        if(!Shaders.environmentMappingProgram.isCompiled) Shaders.environmentMappingProgram.compile();
         glViewport(0, 0, cubeWidth, cubeHeight);
         glBindFramebuffer(GL_FRAMEBUFFER, FBO);
         for (int i = 0; i < 6; i++) {
@@ -69,25 +69,25 @@ public class ReflectionProbe {
             Shaders.skyboxProgram.uploadInt("equirectangularMap",0);
             sceneData.skybox.render();
 
-            Shaders.debugProgram.use();
+            Shaders.environmentMappingProgram.use();
             glClear(GL_DEPTH_BUFFER_BIT);
             glEnable(GL_DEPTH_TEST);
             glEnable(GL_CULL_FACE);
 
-            Shaders.debugProgram.uploadMat4f("cameraProjectionMatrix", CubeMap.projection);
-            Shaders.debugProgram.uploadMat4f("cameraViewMatrix", views[i]);
+            Shaders.environmentMappingProgram.uploadMat4f("cameraProjectionMatrix", CubeMap.projection);
+            Shaders.environmentMappingProgram.uploadMat4f("cameraViewMatrix", views[i]);
 
-            Shaders.debugProgram.uploadInt("albedo",T_ALBEDO);
+            Shaders.environmentMappingProgram.uploadInt("albedo",T_ALBEDO);
 
 
             for(Model model : sceneData.staticModels){
-                Shaders.debugProgram.uploadMat4f("modelMatrix",model.getModelMatrix());
+                Shaders.environmentMappingProgram.uploadMat4f("modelMatrix",model.getModelMatrix());
                 model.bindMaterial();
                 model.render();
             }
         }
 
-        Shaders.debugProgram.detach();
+        Shaders.environmentMappingProgram.detach();
         glBindFramebuffer(GL_FRAMEBUFFER,0);
 
         cubeMap.setEnvironmentID(environmentID);

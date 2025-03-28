@@ -14,6 +14,7 @@ public class Shaders {
     public static Shader specularConvolutionProgram;
     public static Shader precomputeBRDFProgram;
     public static Shader probeProgram;
+    public static Shader environmentMappingProgram;
 
     public static void loadShaders(){
 
@@ -27,7 +28,7 @@ public class Shaders {
         specularConvolutionProgram = new Shader("/assets/shaders/MISC/equirectToCube.vert", "/assets/shaders/PBR/specularConvolution.frag");
         precomputeBRDFProgram = new Shader("/assets/shaders/screen.vert", "/assets/shaders/PBR/IntegrateBRDF.frag");
         probeProgram =  new Shader("/assets/shaders/probe.vert","/assets/shaders/probe.frag");
-
+        environmentMappingProgram = new Shader("/assets/shaders/PBR/reflection.vert","/assets/shaders/PBR/reflection.frag");
 
     }
 }
