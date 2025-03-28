@@ -1,18 +1,13 @@
 package OpenGL_Basic.renderer.passes;
 
-import OpenGL_Basic.engine.Model;
-import OpenGL_Basic.engine.SceneData;
-import OpenGL_Basic.engine.Window;
-import OpenGL_Basic.engine.gameobjects.emitters.PointLight;
+import OpenGL_Basic.engine.scene.elements.model.Model;
+import OpenGL_Basic.engine.scene.SceneData;
 import OpenGL_Basic.renderer.Renderer;
 import OpenGL_Basic.renderer.Shader;
 import OpenGL_Basic.renderer.Shaders;
-import OpenGL_Basic.renderer.buffers.Buffer;
 import OpenGL_Basic.renderer.buffers.FrameBuffer;
+import OpenGL_Basic.renderer.buffers.Sampler2D;
 import OpenGL_Basic.renderer.buffers.Texture;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import org.lwjgl.system.windows.POINT;
 
 import static OpenGL_Basic.renderer.Renderer.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -28,6 +23,7 @@ public class PBRLightingPass extends RenderPass {
         if(!shader.isCompiled) shader.compile();
         this.sceneData = sceneData;
         this.renderer = renderer;
+        renderer.createBRDFLUT();
         FBO = createFrameBuffer(colorBufferRequest,depthBufferRequest,renderer);
     }
 
@@ -69,11 +65,9 @@ public class PBRLightingPass extends RenderPass {
         shader.uploadInt("irradianceMap",B_IRRADIANCE_MAP);
         shader.uploadInt("specularMap",B_SPECULAR_MAP);
         shader.uploadInt("brdfLUT",B_BRDFLUT);
-        sceneData.probeGrid.debugBind();
-//        sceneData.skybox.bindSpecularMap();
-        sceneData.skybox.bindBRDFLUT();
+        renderer.getBuffer(B_BRDFLUT).bind();
 
-        Texture shadowMap = renderer.getBuffer(B_SHADOWMAP);
+        Sampler2D shadowMap = renderer.getBuffer(B_SHADOWMAP);
         shader.uploadInt("shadowMap",B_SHADOWMAP);
         shader.uploadVec2f("shadowMapDimensions", shadowMap.getDimensions());
         shadowMap.bind();
@@ -83,6 +77,7 @@ public class PBRLightingPass extends RenderPass {
             shader.uploadMat4f("modelMatrix",model.getModelMatrix());
             shader.uploadInt("useORM",model.getMaterialType());
             model.bindMaterial();
+            model.bindEnvironmentMap();
             model.render();
         }
 

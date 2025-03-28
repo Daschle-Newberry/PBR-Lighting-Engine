@@ -1,5 +1,6 @@
-package OpenGL_Basic.engine;
+package OpenGL_Basic.engine.scene.elements.model;
 
+import OpenGL_Basic.util.FileReader;
 import OpenGL_Basic.util.ImageLoader;
 import org.lwjgl.BufferUtils;
 
@@ -18,27 +19,27 @@ public class Material {
 
     private int type;
     private int[] textures;
-    public Material(String albedo,String normal, String metallic, String roughness, String AO) {
-        this.type = FORMAT_REGULAR;
+    public Material(String materialFilePath) {
 
-        this.textures = new int[5];
-        this.textures[0] = generateTexture(albedo);
-        this.textures[1] = generateTexture(normal);
-        this.textures[2] = generateTexture(AO);
-        this.textures[3] = generateTexture(metallic);
-        this.textures[4] = generateTexture(roughness);
+        String format = FileReader.readLine(0,materialFilePath + "/tags");
+        String imageType = FileReader.readLine(1,materialFilePath + "/tags");
 
-    }
-
-    public Material(String albedo,String normal, String ORM,String AO) {
-        this.type = FORMAT_ORM;
-
-        this.textures = new int[5];
-        this.textures[0] = generateTexture(albedo);
-        this.textures[1] = generateTexture(normal);
-        this.textures[2] = generateTexture(AO);
-        this.textures[3] = generateTexture(ORM);
-
+        if(format.equals("ORM")){
+            this.type = FORMAT_ORM;
+            this.textures = new int[4];
+            this.textures[0] = generateTexture(materialFilePath + "/albedo." + imageType);
+            this.textures[1] = generateTexture(materialFilePath + "/normal." + imageType);
+            this.textures[2] = generateTexture(materialFilePath + "/ao." + imageType);
+            this.textures[3] = generateTexture(materialFilePath + "/ORM." + imageType);
+        }else{
+            this.type = FORMAT_REGULAR;
+            this.textures = new int[5];
+            this.textures[0] = generateTexture(materialFilePath + "/albedo." + imageType);
+            this.textures[1] = generateTexture(materialFilePath + "/normal." + imageType);
+            this.textures[2] = generateTexture(materialFilePath + "/ao." + imageType);
+            this.textures[3] = generateTexture(materialFilePath + "/metallic." + imageType);
+            this.textures[4] =  generateTexture(materialFilePath + "/roughness." + imageType);
+        }
     }
 
     private int generateTexture(String filePath){

@@ -41,7 +41,7 @@ j  org.lwjgl.opengl.GL12C.glTexSubImage3D(IIIIIIIIIILjava/nio/FloatBuffer;)V+21
 j  org.lwjgl.opengl.GL12.glTexSubImage3D(IIIIIIIIIILjava/nio/FloatBuffer;)V+18
 j  OpenGL_Basic.engine.postprocessing.ShadowMapOffsetTexture.createShadowOffsetTexture(II)I+58
 j  OpenGL_Basic.engine.postprocessing.ShadowMap.<init>(II)V+232
-j  OpenGL_Basic.engine.MainScene.init()V+192
+j  OpenGL_Basic.engine.scene.MainScene.init()V+192
 j  OpenGL_Basic.engine.Window.changeScene(I)V+33
 j  OpenGL_Basic.engine.Window.init()V+224
 j  OpenGL_Basic.engine.Window.run()V+15
@@ -956,13 +956,13 @@ Deoptimization events (20 events):
 Event: 1.938 Thread 0x0000018b40e13790 DEOPT PACKING pc=0x0000018b4968d37d sp=0x00000013d7aff400
 Event: 1.938 Thread 0x0000018b40e13790 DEOPT UNPACKING pc=0x0000018b509f84c2 sp=0x00000013d7afe968 mode 0
 Event: 1.960 Thread 0x0000018b40e13790 Uncommon trap: trap_request=0xffffff45 fr.pc=0x0000018b5112c734 relative=0x0000000000000194
-Event: 1.960 Thread 0x0000018b40e13790 Uncommon trap: reason=unstable_if action=reinterpret pc=0x0000018b5112c734 method=OpenGL_Basic.engine.Model.loadModelFile(Ljava/lang/String;)[F @ 214 c2
+Event: 1.960 Thread 0x0000018b40e13790 Uncommon trap: reason=unstable_if action=reinterpret pc=0x0000018b5112c734 method=OpenGL_Basic.engine.scene.elements.model.Model.loadModelFile(Ljava/lang/String;)[F @ 214 c2
 Event: 1.960 Thread 0x0000018b40e13790 DEOPT PACKING pc=0x0000018b5112c734 sp=0x00000013d7aff4d0
 Event: 1.960 Thread 0x0000018b40e13790 DEOPT UNPACKING pc=0x0000018b509f7982 sp=0x00000013d7aff468 mode 2
 Event: 1.963 Thread 0x0000018b40e13790 DEOPT PACKING pc=0x0000018b496a7c1d sp=0x00000013d7aff3a0
 Event: 1.963 Thread 0x0000018b40e13790 DEOPT UNPACKING pc=0x0000018b509f84c2 sp=0x00000013d7afe968 mode 0
 Event: 1.966 Thread 0x0000018b40e13790 Uncommon trap: trap_request=0xffffff45 fr.pc=0x0000018b5112d0ec relative=0x000000000000016c
-Event: 1.966 Thread 0x0000018b40e13790 Uncommon trap: reason=unstable_if action=reinterpret pc=0x0000018b5112d0ec method=OpenGL_Basic.engine.Model.loadModelFile(Ljava/lang/String;)[F @ 252 c2
+Event: 1.966 Thread 0x0000018b40e13790 Uncommon trap: reason=unstable_if action=reinterpret pc=0x0000018b5112d0ec method=OpenGL_Basic.engine.scene.elements.model.Model.loadModelFile(Ljava/lang/String;)[F @ 252 c2
 Event: 1.966 Thread 0x0000018b40e13790 DEOPT PACKING pc=0x0000018b5112d0ec sp=0x00000013d7aff4f0
 Event: 1.966 Thread 0x0000018b40e13790 DEOPT UNPACKING pc=0x0000018b509f7982 sp=0x00000013d7aff468 mode 2
 Event: 2.032 Thread 0x0000018b40e13790 Uncommon trap: trap_request=0xffffff45 fr.pc=0x0000018b5111d784 relative=0x0000000000000084
@@ -970,7 +970,7 @@ Event: 2.032 Thread 0x0000018b40e13790 Uncommon trap: reason=unstable_if action=
 Event: 2.032 Thread 0x0000018b40e13790 DEOPT PACKING pc=0x0000018b5111d784 sp=0x00000013d7aff100
 Event: 2.032 Thread 0x0000018b40e13790 DEOPT UNPACKING pc=0x0000018b509f7982 sp=0x00000013d7aff080 mode 2
 Event: 2.036 Thread 0x0000018b40e13790 Uncommon trap: trap_request=0xffffff76 fr.pc=0x0000018b5112bd88 relative=0x0000000000001c28
-Event: 2.036 Thread 0x0000018b40e13790 Uncommon trap: reason=predicate action=maybe_recompile pc=0x0000018b5112bd88 method=OpenGL_Basic.engine.Model.processMesh(Lorg/lwjgl/assimp/AIMesh;Ljava/util/ArrayList;)V @ 67 c2
+Event: 2.036 Thread 0x0000018b40e13790 Uncommon trap: reason=predicate action=maybe_recompile pc=0x0000018b5112bd88 method=OpenGL_Basic.engine.scene.elements.model.Model.processMesh(Lorg/lwjgl/assimp/AIMesh;Ljava/util/ArrayList;)V @ 67 c2
 Event: 2.036 Thread 0x0000018b40e13790 DEOPT PACKING pc=0x0000018b5112bd88 sp=0x00000013d7aff360
 Event: 2.036 Thread 0x0000018b40e13790 DEOPT UNPACKING pc=0x0000018b509f7982 sp=0x00000013d7aff330 mode 2
 

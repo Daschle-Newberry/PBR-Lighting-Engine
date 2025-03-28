@@ -12,7 +12,7 @@ import static org.lwjgl.opengl.GL30.*;
 public class FrameBuffer {
     private int width,height, fboID;
 
-    public FrameBuffer(Texture[] colorAttachments, Texture depthAttachment,int width, int height){
+    public FrameBuffer(Sampler2D[] colorAttachments, Sampler2D depthAttachment,int width, int height){
         this.height = height;
         this.width = width;
 
@@ -36,7 +36,7 @@ public class FrameBuffer {
         }
     }
 
-    public FrameBuffer(Texture[] colorAttachments,int width, int height){
+    public FrameBuffer(Sampler2D[] colorAttachments,int width, int height){
         this.height = height;
         this.width = width;
 
@@ -66,7 +66,7 @@ public class FrameBuffer {
     }
 
 
-    public FrameBuffer(Texture depthAttachment,int width, int height){
+    public FrameBuffer(Sampler2D depthAttachment,int width, int height){
         this.height = height;
         this.width = width;
 

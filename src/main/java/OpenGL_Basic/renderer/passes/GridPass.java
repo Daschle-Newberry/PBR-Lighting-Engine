@@ -1,7 +1,7 @@
 //package OpenGL_Basic.renderer.passes;
 //
 //import OpenGL_Basic.engine.Window;
-//import OpenGL_Basic.engine.gameobjects.Camera;
+//import OpenGL_Basic.engine.scene.elements.Camera;
 //import OpenGL_Basic.renderer.Renderer;
 //import OpenGL_Basic.renderer.Shader;
 //import OpenGL_Basic.renderer.Shaders;

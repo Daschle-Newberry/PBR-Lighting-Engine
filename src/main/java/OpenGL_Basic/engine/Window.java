@@ -2,6 +2,8 @@ package OpenGL_Basic.engine;
 
 import OpenGL_Basic.engine.input.KeyListener;
 import OpenGL_Basic.engine.input.MouseListener;
+import OpenGL_Basic.engine.scene.MainScene;
+import OpenGL_Basic.engine.scene.Scene;
 import OpenGL_Basic.util.Time;
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;

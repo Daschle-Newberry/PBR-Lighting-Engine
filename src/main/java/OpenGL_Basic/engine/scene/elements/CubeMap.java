@@ -1,4 +1,4 @@
-package OpenGL_Basic.engine;
+package OpenGL_Basic.engine.scene.elements;
 
 import OpenGL_Basic.renderer.Shaders;
 import OpenGL_Basic.util.ImageLoader;
@@ -6,17 +6,27 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.opengl.GL30.*;
 
 public class CubeMap {
-    private int VAO,VBO;
-    private int skyboxID,irradianceID,specularMap,brdfLUT;
-    private int vertexCount;
-    private int floatBytes = 4;
+    public static Matrix4f projection = new Matrix4f().perspective((float) Math.toRadians(90), 1, .1f, 100.0f);
+    public static Matrix4f[] views = new Matrix4f[]{
+            new Matrix4f().lookAt(new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(1.0f, 0.0f, 0.0f), new Vector3f(0.0f, -1.0f, 0.0f)),
+            new Matrix4f().lookAt(new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(-1.0f, 0.0f, 0.0f), new Vector3f(0.0f, -1.0f, 0.0f)),
+            new Matrix4f().lookAt(new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.0f, 1.0f, 0.0f), new Vector3f(0.0f, 0.0f, 1.0f)),
+            new Matrix4f().lookAt(new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.0f, -1.0f, 0.0f), new Vector3f(0.0f, 0.0f, -1.0f)),
+            new Matrix4f().lookAt(new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.0f, 0.0f, 1.0f), new Vector3f(0.0f, -1.0f, 0.0f)),
+            new Matrix4f().lookAt(new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, -1.0f, 0.0f))
+    };
+
+    private static boolean brdfIsComputed;
+    private static int brdfLUT;
+    private int environmentID,diffuseID,specularID;
+
+
     public CubeMap(String filePath) {
         int equirectangularImage = glGenTextures();
 
@@ -35,11 +45,18 @@ public class CubeMap {
 
 
         convertToCubeMap(equirectangularImage, width.get(0),height.get(0));
+        generateMaps();
 
         width.clear();
         height.clear();
         channels.clear();
         textureIMG.clear();
+    }
+
+    public CubeMap(){};
+
+    public void setEnvironmentID(int environmentID){
+        this.environmentID = environmentID;
     }
 
     public void convertToCubeMap(int equirectangularImage, int width, int height) {
@@ -54,8 +71,8 @@ public class CubeMap {
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, cubeWidth, cubeHeight);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, RBO);
 
-        skyboxID = glGenTextures();
-        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxID);
+        environmentID = glGenTextures();
+        glBindTexture(GL_TEXTURE_CUBE_MAP, environmentID);
 
         for (int i = 0; i < 6; i++) {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, cubeWidth, cubeHeight, 0, GL_RGB, GL_FLOAT, 0);
@@ -66,15 +83,6 @@ public class CubeMap {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        Matrix4f projection = new Matrix4f().perspective((float) Math.toRadians(90), 1, .1f, 10.0f);
-        Matrix4f[] views = new Matrix4f[]{
-                new Matrix4f().lookAt(new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(1.0f, 0.0f, 0.0f), new Vector3f(0.0f, -1.0f, 0.0f)),
-                new Matrix4f().lookAt(new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(-1.0f, 0.0f, 0.0f), new Vector3f(0.0f, -1.0f, 0.0f)),
-                new Matrix4f().lookAt(new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.0f, 1.0f, 0.0f), new Vector3f(0.0f, 0.0f, 1.0f)),
-                new Matrix4f().lookAt(new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.0f, -1.0f, 0.0f), new Vector3f(0.0f, 0.0f, -1.0f)),
-                new Matrix4f().lookAt(new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.0f, 0.0f, 1.0f), new Vector3f(0.0f, -1.0f, 0.0f)),
-                new Matrix4f().lookAt(new Vector3f(0.0f, 0.0f, 0.0f), new Vector3f(0.0f, 0.0f, -1.0f), new Vector3f(0.0f, -1.0f, 0.0f))
-        };
         if (!Shaders.cubeMappingProgram.isCompiled) Shaders.cubeMappingProgram.compile();
 
         Shaders.cubeMappingProgram.use();
@@ -88,19 +96,21 @@ public class CubeMap {
         glBindFramebuffer(GL_FRAMEBUFFER, FBO);
         for (int i = 0; i < 6; i++) {
             Shaders.cubeMappingProgram.uploadMat4f("viewMatrix", views[i]);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, skyboxID, 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, environmentID, 0);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glDrawArrays(GL_TRIANGLES, 0, 36);
 
         }
 
-
         Shaders.cubeMappingProgram.detach();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+    public void generateMaps(){
+        int FBO = glGenFramebuffers();
+        int RBO = glGenRenderbuffers();
 
-        irradianceID = glGenTextures();
-        glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceID);
-
+        diffuseID = glGenTextures();
+        glBindTexture(GL_TEXTURE_CUBE_MAP, diffuseID);
 
         for (int i = 0; i < 6; i++) {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 32, 32, 0, GL_RGB, GL_FLOAT, 0);
@@ -124,11 +134,11 @@ public class CubeMap {
         Shaders.irradianceConvolutionProgram.uploadMat4f("projectionMatrix", projection);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxID);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, environmentID);
         glViewport(0, 0, 32, 32);
         for (int i = 0; i < 6; i++) {
             Shaders.irradianceConvolutionProgram.uploadMat4f("viewMatrix", views[i]);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceID, 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, diffuseID, 0);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
@@ -138,8 +148,8 @@ public class CubeMap {
 
         /* SPECULAR */
 
-        specularMap = glGenTextures();
-        glBindTexture(GL_TEXTURE_CUBE_MAP, specularMap);
+        specularID = glGenTextures();
+        glBindTexture(GL_TEXTURE_CUBE_MAP, specularID);
         FBO = glGenFramebuffers();
         RBO = glGenRenderbuffers();
 
@@ -159,7 +169,7 @@ public class CubeMap {
         Shaders.specularConvolutionProgram.use();
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxID);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, environmentID);
 
         glBindFramebuffer(GL_FRAMEBUFFER, FBO);
         glBindRenderbuffer(GL_RENDERBUFFER,RBO);
@@ -171,7 +181,7 @@ public class CubeMap {
 
         for (int i = 0; i < 6; i++) {
             Shaders.specularConvolutionProgram.uploadMat4f("viewMatrix", views[i]);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, specularMap, 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, specularID, 0);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
@@ -190,7 +200,7 @@ public class CubeMap {
             Shaders.specularConvolutionProgram.uploadFloat("roughness",roughness);
             for (int i = 0; i < 6; i++) {
                 Shaders.specularConvolutionProgram.uploadMat4f("viewMatrix", views[i]);
-                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, specularMap, mip);
+                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, specularID, mip);
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
             }
@@ -198,48 +208,20 @@ public class CubeMap {
 
         Shaders.specularConvolutionProgram.detach();
         glBindFramebuffer(GL_FRAMEBUFFER,0);
-
-        brdfLUT = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D,brdfLUT);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, 512, 512, 0, GL_RG, GL_FLOAT, 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        glBindFramebuffer(GL_FRAMEBUFFER,FBO);
-        glBindRenderbuffer(GL_RENDERBUFFER,RBO);
-        glRenderbufferStorage(GL_RENDERBUFFER,GL_DEPTH_COMPONENT24,512,512);
-        glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,brdfLUT,0);
-
-        if(!Shaders.precomputeBRDFProgram.isCompiled) Shaders.precomputeBRDFProgram.compile();
-
-        glViewport(0,0,512,512);
-        Shaders.precomputeBRDFProgram.use();
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-        glDrawArrays(GL_TRIANGLES,0,6);
-
-        Shaders.precomputeBRDFProgram.detach();
-        glBindFramebuffer(GL_FRAMEBUFFER,0);
     }
-
 
     public void render(){
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP,skyboxID);
+        glBindTexture(GL_TEXTURE_CUBE_MAP,environmentID);
         glDrawArrays(GL_TRIANGLES,0,36);
     }
 
-    public void bindIrradianceMap(){
+    public void bindDiffuseMap(){
         glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_CUBE_MAP,irradianceID);
+        glBindTexture(GL_TEXTURE_CUBE_MAP,diffuseID);
     }
     public void bindSpecularMap(){
         glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_CUBE_MAP,specularMap);
-    }
-    public void bindBRDFLUT(){
-        glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D,brdfLUT);
+        glBindTexture(GL_TEXTURE_CUBE_MAP,specularID);
     }
 }

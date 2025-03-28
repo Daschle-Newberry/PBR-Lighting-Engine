@@ -1,6 +1,6 @@
-package OpenGL_Basic.engine.gameobjects.emitters;
+package OpenGL_Basic.engine.scene.elements.emitters;
 
-import OpenGL_Basic.engine.gameobjects.Perspective;
+import OpenGL_Basic.engine.scene.elements.Perspective;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 

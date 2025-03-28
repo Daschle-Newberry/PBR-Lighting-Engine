@@ -1,18 +1,11 @@
 package OpenGL_Basic.renderer.passes;
 
-import OpenGL_Basic.engine.Model;
-import OpenGL_Basic.engine.SceneData;
-import OpenGL_Basic.engine.Window;
+import OpenGL_Basic.engine.scene.SceneData;
 import OpenGL_Basic.renderer.Renderer;
 import OpenGL_Basic.renderer.Shader;
 import OpenGL_Basic.renderer.Shaders;
-import OpenGL_Basic.renderer.buffers.Buffer;
 import OpenGL_Basic.renderer.buffers.FrameBuffer;
-import OpenGL_Basic.renderer.buffers.Texture;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
-import static OpenGL_Basic.renderer.Renderer.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
 

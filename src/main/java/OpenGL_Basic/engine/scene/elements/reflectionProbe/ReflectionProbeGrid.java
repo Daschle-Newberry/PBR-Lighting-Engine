@@ -1,4 +1,5 @@
-package OpenGL_Basic.engine;
+package OpenGL_Basic.engine.scene.elements.reflectionProbe;
+import OpenGL_Basic.engine.scene.SceneData;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
@@ -21,10 +22,10 @@ public class ReflectionProbeGrid {
     private int brdfLUT, VAO, probeCount;
     private FloatBuffer instanceBuffer;
     private ReflectionProbe[] probes;
-    public Matrix4f scale = new Matrix4f().scale(.1f);
-    public ReflectionProbeGrid(float padding,int size, SceneData sceneData) {
+    public Matrix4f scale = new Matrix4f().scale(.01f);
+    public ReflectionProbeGrid(Vector3f center, Vector3f dimensions, int density, SceneData sceneData) {
 
-        probeCount = size * size * size;
+        probeCount = density * density * density;
 
         VAO = glGenVertexArrays();
         glBindVertexArray(VAO);
@@ -45,10 +46,12 @@ public class ReflectionProbeGrid {
         float[] tmpBuffer = new float[3];
 
         int index = 0;
-        for(int x = -size / 2; x <= size/2; x++){
-            for(int y = -size / 2; y <= size/2; y++){
-                for(int z = -size / 2; z <= size/2; z++){
-                    Vector3f position = new Vector3f(x,-.2f, z);
+        for(int x = -density / 2; x <= density/2; x++){
+            for(int y = -density / 2; y <= density/2; y++){
+                for(int z = -density / 2; z <= density/2; z++){
+//                    Vector3f position = new Vector3f(center.x + x * dimensions.x, center.y + y * dimensions.y, center.z + z * dimensions.z);
+                    Vector3f position = new Vector3f(1.0f,0.0f,0.0f);
+
                     probes[index] = new ReflectionProbe(position, sceneData);
                     tmpBuffer[0] = position.x;
                     tmpBuffer[1] = position.y;
@@ -59,30 +62,11 @@ public class ReflectionProbeGrid {
             }
         }
 
-        update();
         glBufferData(GL_ARRAY_BUFFER,instanceBuffer.flip(),GL_STATIC_DRAW);
-
-
-
-
 
         glBindVertexArray(0);
     }
 
-    public void debugRender(){
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP,probes[0].environmentID);
-        glDrawArrays(GL_TRIANGLES,0,36);
-    }
-
-    public void debugBind(){
-        glActiveTexture(GL_TEXTURE5);
-        glBindTexture(GL_TEXTURE_CUBE_MAP,probes[0].diffuseID);
-
-        glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_CUBE_MAP,probes[0].specularID);
-
-    }
     public ReflectionProbe findNearestProbe(Vector3f position){
         float minDistance = 0;
         ReflectionProbe closestProbe = null;
@@ -110,13 +94,13 @@ public class ReflectionProbeGrid {
         }
     }
 
+    public void debugBindToSkybox(){
+        probes[0].getCubeMap().render();
+    }
+
     public void render(){
         glBindVertexArray(VAO);
         glDrawArraysInstanced(GL_TRIANGLES,0,36,probeCount);
         glBindVertexArray(0);
-    }
-    public void bindBRDFLUT(){
-        glActiveTexture(GL_TEXTURE7);
-        glBindTexture(GL_TEXTURE_2D, brdfLUT);
     }
 }

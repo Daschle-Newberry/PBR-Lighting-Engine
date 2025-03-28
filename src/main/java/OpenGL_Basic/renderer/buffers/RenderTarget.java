@@ -51,11 +51,7 @@ public class RenderTarget implements Buffer {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER,FBO);
         glViewport(0,0,Window.get().width, Window.get().height);
     }
-    @Override
-    public void bindToRead(){
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D,outputTexture);
-    }
+
 
     @Override
     public void detach(){

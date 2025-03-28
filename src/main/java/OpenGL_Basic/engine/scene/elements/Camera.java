@@ -1,10 +1,11 @@
-package OpenGL_Basic.engine.gameobjects;
+package OpenGL_Basic.engine.scene.elements;
 import OpenGL_Basic.engine.Window;
+import OpenGL_Basic.engine.gameobjects.GameObject;
 import org.joml.Matrix4f;
 
 import org.joml.Vector3f;
 
-public class Camera implements Perspective,GameObject {
+public class Camera implements Perspective, GameObject {
     private static float sensitivity = .1f;
 
     private Matrix4f projectionMatrix,viewMatrix,viewMatrixNoTranslation;

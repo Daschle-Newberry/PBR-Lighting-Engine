@@ -1,4 +1,4 @@
-package OpenGL_Basic.engine;
+package OpenGL_Basic.engine.scene;
 
 public abstract class Scene {
     public Scene(){

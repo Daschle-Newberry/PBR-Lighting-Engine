@@ -48,11 +48,6 @@ public class DepthBuffer implements Buffer {
         glViewport(0,0,mapWidth,mapHeight);
     }
 
-    @Override
-    public void bindToRead(){
-        glActiveTexture(GL_TEXTURE6);
-        glBindTexture(GL_TEXTURE_2D,outputTexture);
-    }
 
     @Override
     public void detach(){

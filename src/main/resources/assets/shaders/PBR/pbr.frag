@@ -1,6 +1,6 @@
 #version 420 core
 
-#define MAX_LIGHTS 5
+#define MAX_LIGHTS 1
 #define pi 3.1415926535897932384626433832795
 #define ambientStrength .03
 #define shadowFilterSize 16
@@ -191,6 +191,6 @@ void main() {
 
     vec3 ambient = calculateIBL(N,V,F0);
     float shadowFactor = calcShadowFactor();
-    outColor = vec4(outputLum + ambient,1.0);
+    outColor = vec4((outputLum * shadowFactor) + ambient,1.0);
 
 }

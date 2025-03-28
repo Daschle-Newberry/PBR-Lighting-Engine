@@ -1,14 +1,13 @@
 package OpenGL_Basic.renderer.passes;
 
-import OpenGL_Basic.engine.Model;
-import OpenGL_Basic.engine.SceneData;
-import OpenGL_Basic.engine.gameobjects.Perspective;
+import OpenGL_Basic.engine.scene.elements.model.Model;
+import OpenGL_Basic.engine.scene.SceneData;
+import OpenGL_Basic.engine.scene.elements.Perspective;
 import OpenGL_Basic.renderer.Renderer;
 import OpenGL_Basic.renderer.Shader;
 import OpenGL_Basic.renderer.Shaders;
 import OpenGL_Basic.renderer.buffers.FrameBuffer;
 
-import static OpenGL_Basic.renderer.Renderer.B_NONE;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.*;
 
@@ -20,6 +19,7 @@ public class DepthPass extends RenderPass {
 
     public DepthPass(Renderer renderer, SceneData sceneData, Perspective perspective, int depthBufferRequest) {
         if(!shader.isCompiled) shader.compile();
+        if(!Shaders.probeProgram.isCompiled) Shaders.probeProgram.compile();
         this.sceneData = sceneData;
         FBO = createFrameBuffer(null,depthBufferRequest,renderer);
         this.perspective = perspective;

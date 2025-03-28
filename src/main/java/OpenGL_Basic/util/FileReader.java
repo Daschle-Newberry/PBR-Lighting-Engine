@@ -1,8 +1,7 @@
 package OpenGL_Basic.util;
 
-import OpenGL_Basic.engine.Model;
+import OpenGL_Basic.engine.scene.elements.model.Model;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.Scanner;
 

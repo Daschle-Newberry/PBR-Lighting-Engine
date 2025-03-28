@@ -1,4 +1,4 @@
-package OpenGL_Basic.engine.gameobjects.emitters;
+package OpenGL_Basic.engine.scene.elements.emitters;
 
 import org.joml.Vector3f;
 

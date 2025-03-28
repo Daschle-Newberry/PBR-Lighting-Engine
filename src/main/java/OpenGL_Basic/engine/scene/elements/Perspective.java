@@ -1,4 +1,4 @@
-package OpenGL_Basic.engine.gameobjects;
+package OpenGL_Basic.engine.scene.elements;
 
 import org.joml.Matrix4f;
 

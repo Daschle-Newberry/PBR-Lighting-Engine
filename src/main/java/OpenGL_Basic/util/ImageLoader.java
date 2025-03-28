@@ -1,10 +1,8 @@
 package OpenGL_Basic.util;
 
-import OpenGL_Basic.engine.Material;
+import OpenGL_Basic.engine.scene.elements.model.Material;
 import org.lwjgl.BufferUtils;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;

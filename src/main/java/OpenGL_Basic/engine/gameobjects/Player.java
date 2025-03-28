@@ -2,6 +2,7 @@ package OpenGL_Basic.engine.gameobjects;
 
 
 import OpenGL_Basic.engine.input.KeyListener;
+import OpenGL_Basic.engine.scene.elements.Camera;
 import org.joml.Vector3f;
 
 public class Player {

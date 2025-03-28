@@ -1,9 +1,6 @@
 package OpenGL_Basic.renderer.passes;
 
-import OpenGL_Basic.engine.SceneData;
-import OpenGL_Basic.engine.gameobjects.Camera;
-import OpenGL_Basic.engine.CubeMap;
-import OpenGL_Basic.engine.gameobjects.Perspective;
+import OpenGL_Basic.engine.scene.SceneData;
 import OpenGL_Basic.renderer.Renderer;
 import OpenGL_Basic.renderer.Shader;
 import OpenGL_Basic.renderer.Shaders;
@@ -38,7 +35,7 @@ public class SkyboxPass extends RenderPass{
         shader.uploadMat4f("cameraProjectionMatrix",sceneData.camera.getProjectionMatrix());
         shader.uploadInt("equirectangularMap",0);
 
-        sceneData.skybox.render();
+        sceneData.probeGrid.debugBindToSkybox();
 
         FBO.detach();
         shader.detach();

@@ -41,7 +41,7 @@ j  org.lwjgl.opengl.GL12C.glTexSubImage3D(IIIIIIIIIILjava/nio/FloatBuffer;)V+21
 j  org.lwjgl.opengl.GL12.glTexSubImage3D(IIIIIIIIIILjava/nio/FloatBuffer;)V+18
 j  OpenGL_Basic.engine.postprocessing.ShadowMapOffsetTexture.createShadowOffsetTexture(II)I+58
 j  OpenGL_Basic.engine.postprocessing.ShadowMap.<init>(II)V+232
-j  OpenGL_Basic.engine.MainScene.init()V+192
+j  OpenGL_Basic.engine.scene.MainScene.init()V+192
 j  OpenGL_Basic.engine.Window.changeScene(I)V+33
 j  OpenGL_Basic.engine.Window.init()V+224
 j  OpenGL_Basic.engine.Window.run()V+15
@@ -954,7 +954,7 @@ Event: 1.951 Loaded shared library C:\Users\Dash\AppData\Local\Temp\lwjgl_Dash\3
 
 Deoptimization events (20 events):
 Event: 1.920 Thread 0x000001baebe10a50 Uncommon trap: trap_request=0xffffff45 fr.pc=0x000001ba87bde4ec relative=0x000000000000016c
-Event: 1.920 Thread 0x000001baebe10a50 Uncommon trap: reason=unstable_if action=reinterpret pc=0x000001ba87bde4ec method=OpenGL_Basic.engine.Model.loadModelFile(Ljava/lang/String;)[F @ 252 c2
+Event: 1.920 Thread 0x000001baebe10a50 Uncommon trap: reason=unstable_if action=reinterpret pc=0x000001ba87bde4ec method=OpenGL_Basic.engine.scene.elements.model.Model.loadModelFile(Ljava/lang/String;)[F @ 252 c2
 Event: 1.920 Thread 0x000001baebe10a50 DEOPT PACKING pc=0x000001ba87bde4ec sp=0x00000055321ff210
 Event: 1.920 Thread 0x000001baebe10a50 DEOPT UNPACKING pc=0x000001ba874a7982 sp=0x00000055321ff188 mode 2
 Event: 1.944 Thread 0x000001baebe10a50 Uncommon trap: trap_request=0xffffff45 fr.pc=0x000001ba87bd01d8 relative=0x00000000000002f8
@@ -970,7 +970,7 @@ Event: 1.970 Thread 0x000001baebe10a50 Uncommon trap: reason=unstable_if action=
 Event: 1.970 Thread 0x000001baebe10a50 DEOPT PACKING pc=0x000001ba87bcd904 sp=0x00000055321fee30
 Event: 1.970 Thread 0x000001baebe10a50 DEOPT UNPACKING pc=0x000001ba874a7982 sp=0x00000055321fedb0 mode 2
 Event: 1.974 Thread 0x000001baebe10a50 Uncommon trap: trap_request=0xffffff76 fr.pc=0x000001ba87bdd188 relative=0x0000000000001c28
-Event: 1.974 Thread 0x000001baebe10a50 Uncommon trap: reason=predicate action=maybe_recompile pc=0x000001ba87bdd188 method=OpenGL_Basic.engine.Model.processMesh(Lorg/lwjgl/assimp/AIMesh;Ljava/util/ArrayList;)V @ 67 c2
+Event: 1.974 Thread 0x000001baebe10a50 Uncommon trap: reason=predicate action=maybe_recompile pc=0x000001ba87bdd188 method=OpenGL_Basic.engine.scene.elements.model.Model.processMesh(Lorg/lwjgl/assimp/AIMesh;Ljava/util/ArrayList;)V @ 67 c2
 Event: 1.974 Thread 0x000001baebe10a50 DEOPT PACKING pc=0x000001ba87bdd188 sp=0x00000055321ff080
 Event: 1.974 Thread 0x000001baebe10a50 DEOPT UNPACKING pc=0x000001ba874a7982 sp=0x00000055321ff050 mode 2
 
