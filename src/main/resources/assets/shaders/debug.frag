@@ -2,11 +2,11 @@
 
 layout(location = 0) out vec4 outColor;
 
-uniform sampler2D albedo;
+uniform vec3 lightDirection;
 
 in vec3 fragNormal;
 in vec2 UV;
 
 void main(){
-    outColor = vec4(pow(texture(albedo,UV).rgb,vec3(2.2)),1.0f);
+    outColor = vec4(normalize(vec3(dot(lightDirection,fragNormal))),1.0f);
 }

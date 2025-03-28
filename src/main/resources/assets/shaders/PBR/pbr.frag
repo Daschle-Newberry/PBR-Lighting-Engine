@@ -113,7 +113,7 @@ vec3 fresnelSchlick(vec3 H, vec3 V, vec3 F0){
     float hDv = max(0.0,dot(H,V));
     return F0 + (1 - F0) * pow((1-(hDv)),5.0);
 }
-vec3 FresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+vec3 fresnelShlickFromRoughness(float cosTheta, vec3 F0, float roughness)
 {
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
@@ -157,6 +157,7 @@ vec3 CookTorrenceBRDF(Light light, vec3 N, vec3 V,vec3 F0){
     return (kD * material.albedo/pi + specular) * radiance * max(0.0,dot(N,L));
 }
 vec3 calculateIBL(vec3 N, vec3 V,vec3 F0){
+    // Specular part of this function is heavily influenced by learnopengl.com/PBR/IBL/Specular-IBL
     vec3 kS = fresnelSchlick(N,V,F0);
     vec3 kD = vec3(1.0) - kS;
     kD *= 1.0 - material.metallic;
@@ -165,11 +166,13 @@ vec3 calculateIBL(vec3 N, vec3 V,vec3 F0){
     vec3 diffuse = irradiance * material.albedo/pi;
 
     const float MAX_REFLECTION_LOD = 4.0;
-    vec3 R = reflect(-V,N);
-    vec3 F = FresnelSchlickRoughness(max(dot(N, V), 0.0), F0, material.roughness);
-    vec3 prefilteredColor = textureLod(specularMap, R, material.roughness * MAX_REFLECTION_LOD).rgb;
-    vec2 envBRDF = texture(brdfLUT,vec2(max(dot(N,V),0.0),material.roughness)).rg;
-    vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
+
+    vec3 reflectionVector = reflect(-V,N);
+    vec3 F = fresnelShlickFromRoughness(max(dot(N, V), 0.0), F0, material.roughness);
+
+    vec3 prefilteredColor = textureLod(specularMap, reflectionVector, material.roughness * MAX_REFLECTION_LOD).rgb;
+    vec2 precalculatedBRDF = texture(brdfLUT,vec2(max(dot(N,V),0.0),material.roughness)).rg;
+    vec3 specular = prefilteredColor * (F * precalculatedBRDF.x + precalculatedBRDF.y);
     return (kD * diffuse + specular) * material.AO;
 }
 void main() {

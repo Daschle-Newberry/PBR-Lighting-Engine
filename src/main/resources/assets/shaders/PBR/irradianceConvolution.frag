@@ -1,4 +1,7 @@
 #version 460 core
+/*
+ THIS CODE IS FROM learnopengl.com/PBR/IBL/Specular-IBL
+*/
 layout(location = 0) out vec4 outColor;
 
 uniform samplerCube environmentMap;
@@ -35,3 +38,6 @@ void main() {
 
     outColor = vec4(irradiance,1.0f);
 }
+/*
+ THIS CODE IS FROM learnopengl.com/PBR/IBL/Specular-IBL
+*/

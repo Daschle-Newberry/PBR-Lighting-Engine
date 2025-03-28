@@ -1,4 +1,8 @@
 #version 460 core
+/*
+ THIS CODE IS FROM learnopengl.com/PBR/IBL/Specular-IBL
+*/
+
 layout(location = 0) out vec4 outColor;
 in vec3 localPos;
 
@@ -31,13 +35,11 @@ vec3 ImportanceSampleGGX(vec2 Xi, vec3 N, float roughness)
     float cosTheta = sqrt((1.0 - Xi.y) / (1.0 + (a*a - 1.0) * Xi.y));
     float sinTheta = sqrt(1.0 - cosTheta*cosTheta);
 
-    // from spherical coordinates to cartesian coordinates
     vec3 H;
     H.x = cos(phi) * sinTheta;
     H.y = sin(phi) * sinTheta;
     H.z = cosTheta;
 
-    // from tangent-space vector to world-space sample vector
     vec3 up        = abs(N.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
     vec3 tangent   = normalize(cross(up, N));
     vec3 bitangent = cross(N, tangent);
@@ -75,3 +77,6 @@ void main() {
 
     outColor = vec4(prefilteredColor,1.0f);
 }
+/*
+ THIS CODE IS FROM learnopengl.com/PBR/IBL/Specular-IBL
+*/
