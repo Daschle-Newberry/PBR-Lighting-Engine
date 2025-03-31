@@ -2,7 +2,8 @@
 This project is a Physically Based Rendering (PBR) graphics engine, which uses the principles of PBR to render realistic looking materials based on the Cook-Torrence BRDF (Bidirectional Reflectance Distribution Function). 
 
 The BRDF is used to approximate the specular and diffuse portion of the reflectance equation, which is the following: 
-![CodeCogsEqn](https://github.com/user-attachments/assets/d27266f2-5c5d-4928-b548-28f3a70d768e)
+![CodeCogsEqn (2)](https://github.com/user-attachments/assets/f81d6f54-020f-4072-9f66-3a4b2da8de3a)
+
 
 The function fr(), is the BRDF part of the reflectance eqaution. Li() is the incident radiance, and alters the outgoing radiance (Lo) depending on the light intensity and color. The dot product of the normal (n) and the incident light direction (wi) scales the outgoing radiance depending on if the point (or fragment in our case) is facing the light source.
 
