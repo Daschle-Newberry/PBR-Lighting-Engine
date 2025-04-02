@@ -22,41 +22,19 @@ public class Window {
     private String title;
     private long glfwWindow;
 
-    public float r,g,b,a;
-    private boolean fadeToBlack = false;
-
     private static Window window = null;
 
     private static Scene currentScene;
 
-    private static double lowestFrameRate = -1;
     public static double totalTime;
     private static int totalFrames;
-
-    private static double totalRenderTime = -1;
-    private static double highestRenderTime;
 
     private Window() {
         this.width = 2560;
         this.height = 1440;
-        this.title = "Test";
-        r = 0;
-        g = 0;
-        b = 0;
-        a = 1;
+        this.title = "PBR Engine";
     }
 
-    public static void changeScene(int newScene){
-        switch (newScene){
-            case 0:
-                currentScene = new MainScene();
-                currentScene.init();
-
-                break;
-            default:
-                assert false: "Unknown Scene " + newScene + ".";
-        }
-    }
     public static Window get(){
         if (Window.window == null){
             Window.window = new Window();
@@ -66,7 +44,7 @@ public class Window {
     }
 
     public void run(){
-        System.out.println("Hello LWJGL" + Version.getVersion());
+        System.out.println("Hello PBR Engine" + Version.getVersion());
         init();
         loop();
 
@@ -119,18 +97,19 @@ public class Window {
         //Show Window
         glfwShowWindow(glfwWindow);
 
-       GL.createCapabilities();
+        GL.createCapabilities();
 
-       glEnable(GL_DEPTH_TEST);
-       glEnable(GL_CULL_FACE);
-       glEnable(GL_MULTISAMPLE);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        glEnable(GL_MULTISAMPLE);
         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
         glfwSetWindowSize(glfwWindow,this.width,this.height);
-       glViewport(0,0,width,height);
-       glClearColor(.2f,.2f,.2f,1.0f);
+        glViewport(0,0,width,height);
+        glClearColor(.2f,.2f,.2f,1.0f);
 
-        Window.changeScene(0);
+        currentScene = new MainScene();
+        currentScene.init();
     }
 
 
@@ -139,25 +118,11 @@ public class Window {
         double endTime;
         double dt = -1.0f;
 
-        double renderStart;
-        double renderEnd;
         while(!glfwWindowShouldClose(glfwWindow)){
             //Poll Events
             glfwPollEvents();
 
-            renderStart = Time.getTime();
-            if (dt >= 0){
-                currentScene.update(dt);
-            }
-            renderEnd = Time.getTime();
-
-            double renderTime = (renderEnd-renderStart);
-
-            if(renderTime > highestRenderTime | highestRenderTime < 0){
-                highestRenderTime = renderTime;
-            }
-
-            totalRenderTime += renderTime;
+            currentScene.update(dt);
 
             glfwSwapBuffers(glfwWindow);
 
@@ -165,9 +130,7 @@ public class Window {
             dt = endTime - beginTime;
             totalFrames += 1;
             totalTime += dt;
-            if(1/dt < lowestFrameRate | lowestFrameRate < 0){
-                lowestFrameRate = 1/dt;
-            }
+
             glfwSetWindowTitle(glfwWindow,"FPS " + 1/dt);
             beginTime = endTime;
         }

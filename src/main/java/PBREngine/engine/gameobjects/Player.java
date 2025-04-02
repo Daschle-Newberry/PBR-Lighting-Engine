@@ -5,7 +5,7 @@ import PBREngine.engine.input.KeyListener;
 import PBREngine.engine.scene.elements.Camera;
 import org.joml.Vector3f;
 
-public class Player {
+public class Player implements GameObject{
     private static float speed = .005f;
 
     private Vector3f position;
@@ -16,12 +16,7 @@ public class Player {
         this.position = position;
         this.camera = camera;
     }
-    public void updatePlayer(){
-        movePlayer();
-        camera.updateCameraPosition(position);
 
-
-    }
 
     private void movePlayer(){
         Vector3f cameraFront = camera.getFrontVector();
@@ -56,5 +51,10 @@ public class Player {
         return position;
     }
 
+    @Override
+    public void update() {
+        movePlayer();
+        camera.updateCameraPosition(position);
+    }
 }
 

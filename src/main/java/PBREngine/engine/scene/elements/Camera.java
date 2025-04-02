@@ -5,7 +5,7 @@ import org.joml.Matrix4f;
 
 import org.joml.Vector3f;
 
-public class Camera implements Perspective, GameObject {
+public class Camera implements Perspective {
     private static float sensitivity = .1f;
 
     private Matrix4f projectionMatrix,viewMatrix,viewMatrixNoTranslation;
@@ -58,24 +58,19 @@ public class Camera implements Perspective, GameObject {
 
     @Override
     public Matrix4f getViewMatrix(){
+        viewMatrix.identity();
+        viewMatrix.lookAt(this.position,
+                new Vector3f(position.x + cameraFront.x,position.y + cameraFront.y,position.z + cameraFront.z),
+                cameraUp);
         return viewMatrix;
 
     }
 
     @Override
     public Matrix4f getViewMatrixNoTranslation(){
-        return viewMatrixNoTranslation;
-    }
-
-    @Override
-    public void update(){
-        viewMatrix.identity();
-        viewMatrix.lookAt(this.position,
-                new Vector3f(position.x + cameraFront.x,position.y + cameraFront.y,position.z + cameraFront.z),
-                cameraUp);
-
         viewMatrixNoTranslation.identity();
         viewMatrixNoTranslation.lookAlong(this.cameraFront,this.cameraUp);
+        return viewMatrixNoTranslation;
     }
 
     @Override

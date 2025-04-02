@@ -24,7 +24,6 @@ public class MainScene extends Scene{
     //Gameplay Elements
     private Player player;
     private Renderer renderer;
-    private ArrayList<GameObject> gameObjects;
 
 
 
@@ -33,7 +32,6 @@ public class MainScene extends Scene{
     public void init() {
         Shaders.loadShaders();
         sceneData = new SceneData();
-        gameObjects = new ArrayList<>();
         sceneData.models = new ArrayList<>();
         sceneData.staticModels = new ArrayList<>();
         sceneData.probeGrid = new ReflectionProbeGrid(new Vector3f(0.0f,.5f,0.0f), new Vector3f(.8f,.3f,.8f),3,sceneData);
@@ -53,7 +51,6 @@ public class MainScene extends Scene{
                 new Matrix4f().ortho(-4f,4f,-3,3,0.1f,10));
 
         sceneData.camera = new Camera(new Vector3f(0.0f,0.0f,0.0f));
-        gameObjects.add(sceneData.camera);
 
         sceneData.skybox = new CubeMap("/assets/skybox/newport_loft.hdr");
 
@@ -116,15 +113,9 @@ public class MainScene extends Scene{
 
     @Override
     public void update(double dt) {
-        for(GameObject g : gameObjects){
-            g.update();
-        }
-
-        sceneData.sceneLight.setLightPos(new Vector3f(4 * (float)Math.cos(Window.get().totalTime/50),1.0f,4 * (float)Math.sin(Window.get().totalTime/50)));
-
         sceneData.camera.processMouseMovement(MouseListener.getDx(),MouseListener.getDy());
         MouseListener.proccessMovement();
-        player.updatePlayer();
+        player.update();
         render();
     }
 

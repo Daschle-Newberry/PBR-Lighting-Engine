@@ -1,6 +1,5 @@
 package PBREngine;
 
-
 import PBREngine.engine.Window;
 
 public class Main {

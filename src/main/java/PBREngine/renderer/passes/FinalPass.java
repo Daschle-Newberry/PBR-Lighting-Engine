@@ -5,7 +5,6 @@ import PBREngine.renderer.Renderer;
 import PBREngine.renderer.Shader;
 import PBREngine.renderer.Shaders;
 import PBREngine.renderer.buffers.FrameBuffer;
-import PBREngine.util.Quad;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -27,27 +26,6 @@ public class FinalPass extends RenderPass {
         if(!shader.isCompiled) shader.compile();
         this.renderer = renderer;
         FBO = createFrameBuffer(colorBufferRequest,depthBufferRequest,renderer);
-
-        screenQuad  = glGenVertexArrays();
-        glBindVertexArray(screenQuad);
-
-        FloatBuffer quadVertexBuffer = BufferUtils.createFloatBuffer(Quad.quadVertices.length);
-        quadVertexBuffer.put(Quad.quadVertices).flip();
-
-        //VBO
-        int quadVBO = glGenBuffers();
-
-        glBindBuffer(GL_ARRAY_BUFFER,quadVBO);
-
-        glBufferData(GL_ARRAY_BUFFER,quadVertexBuffer,GL_STATIC_DRAW);
-
-        // XYZ
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0,2,GL_FLOAT,false,4 * 4,0);
-
-        // RGB
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1,2,GL_FLOAT,false,4 * 4,2 * 4);
     }
     @Override
     public void render() {
@@ -64,7 +42,6 @@ public class FinalPass extends RenderPass {
         shader.uploadInt("colortex0",0);
         renderer.getBuffer(B_COLORTEX0).bindTo(0);
 
-        glBindVertexArray(screenQuad);
         glDrawArrays(GL_TRIANGLES,0,6);
 
         shader.detach();
