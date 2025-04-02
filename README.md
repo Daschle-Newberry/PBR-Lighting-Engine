@@ -14,8 +14,8 @@ PBR works based on the core principle that a surface is made up of microfacets, 
 
 For our cases we will break down the BRDF into two parts Kd (diffuse light) and Ks (specular light).
 
-The Ks term is calculated by the following equation:
-<img  src = "https://github.com/user-attachments/assets/0a21ffb4-076a-43d7-9670-40fdd7585f11" width = 50px/>
+The Ks term is calculated by the following equation: <span></span>
+<img  src = "https://github.com/user-attachments/assets/0a21ffb4-076a-43d7-9670-40fdd7585f11" width = 200px/>
 
 The Normal Distribution Function (D):
 ![NDF](https://github.com/user-attachments/assets/146f2fcc-be42-430c-85ca-c1997485158f)
