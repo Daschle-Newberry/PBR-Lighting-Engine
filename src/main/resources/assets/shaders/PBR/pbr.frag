@@ -113,9 +113,9 @@ vec3 fresnelSchlick(vec3 H, vec3 V, vec3 F0){
     float hDv = max(0.0,dot(H,V));
     return F0 + (1 - F0) * pow((1-(hDv)),5.0);
 }
-vec3 fresnelShlickFromRoughness(float cosTheta, vec3 F0, float roughness)
-{
-    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+vec3 fresnelShlickFromRoughness(vec3 N, vec3 V, vec3 F0, float roughness){
+    float nDv = max(dot(N,V),0.0);
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - nDv, 0.0, 1.0), 5.0);
 }
 
 
@@ -168,7 +168,7 @@ vec3 calculateIBL(vec3 N, vec3 V,vec3 F0){
     const float MAX_REFLECTION_LOD = 4.0;
 
     vec3 reflectionVector = reflect(-V,N);
-    vec3 F = fresnelShlickFromRoughness(max(dot(N, V), 0.0), F0, material.roughness);
+    vec3 F = fresnelShlickFromRoughness(N,V, F0, material.roughness);
 
     vec3 prefilteredColor = textureLod(specularMap, reflectionVector, material.roughness * MAX_REFLECTION_LOD).rgb;
     vec2 precalculatedBRDF = texture(brdfLUT,vec2(max(dot(N,V),0.0),material.roughness)).rg;
