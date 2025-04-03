@@ -78,7 +78,7 @@ To finalize the specular term, we divide by 4 times the dot product of the outgo
 
 <h3>The diffuse portion is much simpler than the specular portion and only involves two steps: </h3>
 
-<img  src = "https://github.com/user-attachments/assets/82ec3849-e45d-4956-8f6a-3749772aced0" height = "25px" width = "auto"/>
+<img  src = "https://github.com/user-attachments/assets/82ec3849-e45d-4956-8f6a-3749772aced0" height = "50px" width = "auto"/>
 
 
 First, we compute the ratio of light that is diffuse by first finding what portion of the light is specular (reflected). Since the Fresnel term determines the magnitude of the specular portion, we can use its compliment to determine the magnitude of the diffuse portion:
