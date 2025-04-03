@@ -96,7 +96,7 @@ We use the kd term to scale the color of the surface, but we must divide the sur
 
 While the previous calculations are used to calculate the lighting of an object with respect to a single light source, they do NOT include the image based lighting calculations, which are responsible for the majority of the specular reflections in the scene. The image based lighting is calculated using the same reflectance equation, plus some optimizations to make it possible to compute it over an entire hemisphere of infinite view angles. The primary optimization we make it precomputing the image based lighting, which then utilizes optimizations like the split-sum approximation and importance sampling
 
-If you would like to learn more about image based lighting:
+If you would like to learn more about image based lighting: </br>
 <a href = "https://learnopengl.com/PBR/IBL/Diffuse-irradiance"> Diffuse </a> </br>
 <a href = "https://learnopengl.com/PBR/IBL/Specular-IBL"> Specular </a>
 
