@@ -10,17 +10,17 @@ This project is a Physically Based Rendering (PBR) graphics engine, which uses t
 
 2. Once within the project directory, run the following command. This will create an jar file for the project that contains all the necessary resources
 
-   ```
-   gradle shadowjar
-   ```
+ ```
+ gradle shadowjar
+ ```
 
 3. Locate the jar file, it should be in the build\libs folder
 
 4. Copy the jar location and run this command in the terminal
-
-```
-java -jar C:\Users\...\path\to\the\jar
-```
+  
+  ```
+  java -jar C:\Users\...\path\to\the\jar
+  ```
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <h2> Important! </h2>
@@ -37,25 +37,25 @@ The BRDF is used to approximate the specular and diffuse portion of the reflecta
 The function fr(), is the BRDF part of the reflectance eqaution. Li() is the incident radiance, and alters the outgoing radiance (Lo) depending on the light intensity and color. The dot product of the normal (n) and the incident light direction (wi) scales the outgoing radiance depending on if the point (or fragment in our case) is facing the light source.
 
 
-**Let's look at the BRDF and how it is calculated. **
+<h3> Let's look at the BRDF and how it is calculated</h3>
 
 PBR works based on the core principle that a surface is made up of microfacets, which are very small reflective surfaces. Depending on the roughness of the surface, these microfacets will be aligned in different directions, which changes how the surface interacts with light.
 
 For our cases we will break down the BRDF into two parts diffuse light and specular light.
 
-The Specular portion is calculated by the following equation: <br/>
+<h3> The Specular portion is calculated by the following equation: </h3> <br/>
 
 <img  src = "https://github.com/user-attachments/assets/0a21ffb4-076a-43d7-9670-40fdd7585f11" height = "50px" width = "auto"/>
 
 
-The Normal Distribution Function (D):<br/>
+<h4> The Normal Distribution Function (D): </h4><br/>
 
 <img  src = "https://github.com/user-attachments/assets/146f2fcc-be42-430c-85ca-c1997485158f" height = "50px" width = "auto"/>
 
 
 The Normal Distribution Function (NDF) represents the amount of surface area that is aligned with the half-vector between the incident light direction and the view direction. Using the surface normal, the half-vector, and the roughness paramter (alpha) we can calculate the D term. 
 
-The Geometry Function (G):<br/>
+<h4> The Geometry Function (G): </h4> <br/>
 
 <img  src = "https://github.com/user-attachments/assets/35ad338f-1b4d-4e61-8cee-c5360fff71d9" height = "50px" width = "auto"/>
 
@@ -64,7 +64,7 @@ Similarily to the NDF, the Geometry function represents the amount of surface ar
 
 <img  src = "https://github.com/user-attachments/assets/686105c7-72d9-4592-9572-3e4b8507d53f" height = "25px" width = "auto"/>
 
-Fresnel equation (F)
+<h4> Fresnel equation (F) </h4>
 The fresnel equation is perhaps one of the most import parts of the BRDF, and it represents the ratio of light that is reflected over the portion that is refracted. It is calcualted using the following equation:
 
 <img src = "https://github.com/user-attachments/assets/7794d042-0b84-4fa1-a840-836845f6ff45" height = "25px" width = "auto" />
@@ -74,7 +74,7 @@ F0 represents the base reflectivty of an object, which determines how reflective
 
 To finalize the specular term, we divide by 4 times the dot product of the outgoing light direction (view direction) and the normal times the dot product of the incident light direction and the normal. We do this to ensure that the outgoing light does not exceed the incoming light (law of conservation of energy).
 
-The diffuse portion is much simpler than the specular portion and only involves two steps:
+<h3>The diffuse portion is much simpler than the specular portion and only involves two steps: </h3>
 
 <img  src = "https://github.com/user-attachments/assets/201f5e82-7d74-4f16-a380-5df6933a0205" height = "25px" width = "auto"/>
 
