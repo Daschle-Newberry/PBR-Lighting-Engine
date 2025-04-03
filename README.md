@@ -66,7 +66,7 @@ Similarly to the NDF, the Geometry function represents the amount of surface are
 
 <h4> Fresnel equation (F) </h4> <br/>
 
-<img src = "https://github.com/user-attachments/assets/7794d042-0b84-4fa1-a840-836845f6ff45" height = "25px" width = "auto" padding = "4px" />
+<img src = "https://github.com/user-attachments/assets/7794d042-0b84-4fa1-a840-836845f6ff45" height = "25px" width = "auto" style = "padding: 4px;" />
 
 The Fresnel equation is perhaps one of the most import parts of the BRDF, and it represents the ratio of light that is reflected over the portion that is refracted. It is calculated using the following equation:
 
