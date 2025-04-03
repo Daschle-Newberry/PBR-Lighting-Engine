@@ -45,28 +45,29 @@ For our cases we will break down the BRDF into two parts, diffuse light and spec
 <h3> The Specular portion is calculated by the following equation: </h3> <br/>
 
 <img  src = "https://github.com/user-attachments/assets/0a21ffb4-076a-43d7-9670-40fdd7585f11" height = "50px" width = "auto"/>
-
+<br/>
 
 <h4> The Normal Distribution Function (D): </h4> <br/>
 
 <img  src = "https://github.com/user-attachments/assets/146f2fcc-be42-430c-85ca-c1997485158f" height = "50px" width = "auto"/>
-
+<br/>
 
 The Normal Distribution Function (NDF) represents the amount of surface area that is aligned with the half-vector between the incident light direction and the view direction. Using the surface normal, the half-vector, and the roughness parameter (alpha) we can calculate the D term. 
 
 <h4> The Geometry Function (G): </h4> <br/>
 
 <img  src = "https://github.com/user-attachments/assets/35ad338f-1b4d-4e61-8cee-c5360fff71d9" height = "50px" width = "auto"/>
-
+<br/>
 
 Similarly to the NDF, the Geometry function represents the amount of surface area that is self shadowed. Since micro-facets can either obstruct light from reaching the viewer or reflect the light away from the viewer, we must calculate the geometry term once using the light vector and once using the view vector:<br/>
 
 <img  src = "https://github.com/user-attachments/assets/686105c7-72d9-4592-9572-3e4b8507d53f" height = "25px" width = "auto"/>
+<br/>
 
 <h4> Fresnel equation (F) </h4> <br/>
 
 <img src = "https://github.com/user-attachments/assets/7794d042-0b84-4fa1-a840-836845f6ff45" height = "25px" width = "auto" />
-
+<br/>
 
 The Fresnel equation is perhaps one of the most import parts of the BRDF, and it represents the ratio of light that is reflected over the portion that is refracted. It is calculated using the following equation:
 
@@ -78,12 +79,12 @@ To finalize the specular term, we divide by 4 times the dot product of the outgo
 <h3>The diffuse portion is much simpler than the specular portion and only involves two steps: </h3>
 
 <img  src = "https://github.com/user-attachments/assets/82ec3849-e45d-4956-8f6a-3749772aced0" height = "50px" width = "auto"/>
-
+<br/>
 
 First, we compute the ratio of light that is diffuse by first finding what portion of the light is specular (reflected). Since the Fresnel term determines the magnitude of the specular portion, we can use its compliment to determine the magnitude of the diffuse portion:
 
 <img src = "https://github.com/user-attachments/assets/42c451e5-30cb-4212-ac9a-f54a06515430" height = "25px" width = "auto"/>
-
+<br/>
 
 We use the kd term to scale the color of the surface, but we must divide the surface albedo by pi. The division by pi is to ensure that the outgoing light energy is not greater than the incoming light energy as we integrate over the entire hemisphere (As seen in the BRDF):
 
@@ -91,7 +92,7 @@ We use the kd term to scale the color of the surface, but we must divide the sur
 <h3> With that, we can finally calculate the BRDF</h3>
 
 <img src = "https://github.com/user-attachments/assets/86f8e1f9-c5e8-43f4-85d1-da58bc718d30" height = "25px" width = "auto"/>
-
+<br/>
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
