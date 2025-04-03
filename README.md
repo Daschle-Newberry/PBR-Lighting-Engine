@@ -64,11 +64,12 @@ Similarly to the NDF, the Geometry function represents the amount of surface are
 
 <img  src = "https://github.com/user-attachments/assets/686105c7-72d9-4592-9572-3e4b8507d53f" height = "25px" width = "auto"/>
 
-<h4> Fresnel equation (F) </h4>
-The Fresnel equation is perhaps one of the most import parts of the BRDF, and it represents the ratio of light that is reflected over the portion that is refracted. It is calculated using the following equation: </br>
+<h4> Fresnel equation (F) </h4> <br/>
 
 <img src = "https://github.com/user-attachments/assets/7794d042-0b84-4fa1-a840-836845f6ff45" height = "25px" width = "auto" />
 
+
+The Fresnel equation is perhaps one of the most import parts of the BRDF, and it represents the ratio of light that is reflected over the portion that is refracted. It is calculated using the following equation:
 
 F0 represents the base reflectivity of an object, which determines how reflective each color of a surface albedo is. For example, a gold reflective surface may have a F0 of (1.00, 0.71, 0.29). The Fresnel equation takes the base reflectivity, and increases it by a portion of its complement. How large the compliment is is dependent on the angle between the half vector and the view vector. This calculation causes surfaces to be more reflective when they are observed at grazing angles, similar to real life. 
 
@@ -77,12 +78,13 @@ To finalize the specular term, we divide by 4 times the dot product of the outgo
 
 <h3>The diffuse portion is much simpler than the specular portion and only involves two steps: </h3>
 
-<img  src = "!https://github.com/user-attachments/assets/82ec3849-e45d-4956-8f6a-3749772aced0" height = "25px" width = "auto"/>
+<img  src = "https://github.com/user-attachments/assets/82ec3849-e45d-4956-8f6a-3749772aced0" height = "25px" width = "auto"/>
 
 
 First, we compute the ratio of light that is diffuse by first finding what portion of the light is specular (reflected). Since the Fresnel term determines the magnitude of the specular portion, we can use its compliment to determine the magnitude of the diffuse portion:
 
 <img src = "https://github.com/user-attachments/assets/42c451e5-30cb-4212-ac9a-f54a06515430" height = "25px" width = "auto"/>
+
 
 We use the kd term to scale the color of the surface, but we must divide the surface albedo by pi. The division by pi is to ensure that the outgoing light energy is not greater than the incoming light energy as we integrate over the entire hemisphere (As seen in the BRDF):
 
@@ -90,6 +92,7 @@ We use the kd term to scale the color of the surface, but we must divide the sur
 <h3> With that, we can finally calculate the BRDF</h3>
 
 <img src = "https://github.com/user-attachments/assets/86f8e1f9-c5e8-43f4-85d1-da58bc718d30" height = "25px" width = "auto"/>
+
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
