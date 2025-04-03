@@ -48,7 +48,7 @@ For our cases we will break down the BRDF into two parts diffuse light and specu
 <img  src = "https://github.com/user-attachments/assets/0a21ffb4-076a-43d7-9670-40fdd7585f11" height = "50px" width = "auto"/>
 
 
-<h4> The Normal Distribution Function (D): </h4><br/>
+<h4> The Normal Distribution Function (D): </h4> <br/>
 
 <img  src = "https://github.com/user-attachments/assets/146f2fcc-be42-430c-85ca-c1997485158f" height = "50px" width = "auto"/>
 
@@ -76,19 +76,29 @@ To finalize the specular term, we divide by 4 times the dot product of the outgo
 
 <h3>The diffuse portion is much simpler than the specular portion and only involves two steps: </h3>
 
-<img  src = "https://github.com/user-attachments/assets/201f5e82-7d74-4f16-a380-5df6933a0205" height = "25px" width = "auto"/>
+<img  src = "!https://github.com/user-attachments/assets/82ec3849-e45d-4956-8f6a-3749772aced0" height = "25px" width = "auto"/>
 
 
 First we compute the ratio of light that is diffuse by first finding what portion of the light is specular (reflected). Since the fresnel term determines the magnitude of specular portion, we can use it's compliment to determine the magnitude of the specular portion:
 
 <img src = "https://github.com/user-attachments/assets/42c451e5-30cb-4212-ac9a-f54a06515430" height = "25px" width = "auto"/>
 
+We use the kd term to scale the color of the surface, but we must divide the surface albedo by pi. The division by pi is to ensure that the outgoing light energy is not greater than the incoming light energy as we integrate over the entire hemisphere (As seen in the BRDF):
 
-Then, to find Lambertian term (flambert), we divide the material albedo (c) by pi. The division by pi is to ensure that the outgoing light energy is not greater than the incoming light energy as we integrate over the entire hemisphere (As seen in the BRDF):
 
-<img src = "https://github.com/user-attachments/assets/911d7360-d268-4ac9-91af-eca8e4bcb4c6" height = "50px" width = "auto"/>
+<h3> With that, we can finally calculate the BRDF</h3>
+
+<img src = "https://github.com/user-attachments/assets/86f8e1f9-c5e8-43f4-85d1-da58bc718d30" height = "25px" width = "auto"/>
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+<h2> Note </h2>
+
+While the previous calculations are used to calculate the lighting of an object with respect to a single light source, they do NOT include the image based lighting calculations, which are responsible for the majority of the specular reflections in the scene. The image based lighting is calculated using the same reflectance equation, plus some optimizations to make it possible to compute it over an entire hemisphere of infinite view angles. The primary optimization we make it precomputing the image based lighting, which then utilizes optimizations like the split-sum approximation and importance sampling
+
+If you would like to learn more about image based lighting:
+<a href = "https://learnopengl.com/PBR/IBL/Diffuse-irradiance"> Diffuse </a>
+<a href = "https://learnopengl.com/PBR/IBL/Specular-IBL"> Specular </a>
 
 
 
