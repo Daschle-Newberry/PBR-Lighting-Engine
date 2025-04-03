@@ -34,7 +34,7 @@ The Geometry Function (G):<br/>
 
 Similarily to the NDF, the Geometry function represents the amount of surface area that is self shadowed. Since microfacets can either obstruct light from reaching the viewer or reflect the light away from the viewer, we must calculate the geometry term once using the light vector and once using the view vector:<br/>
 
-<img  src = "https://github.com/user-attachments/assets/686105c7-72d9-4592-9572-3e4b8507d53f" height = "50px" width = "auto"/>
+<img  src = "https://github.com/user-attachments/assets/686105c7-72d9-4592-9572-3e4b8507d53f" height = "25px" width = "auto"/>
 
 
 -----------------------------fresnel?----------------
@@ -44,7 +44,7 @@ To finalize the specular term, we divide by 4 times the dot product of the outgo
 The diffuse portion is much simpler than the specular portion and only involves two steps.
 First we compute the ratio of light that is diffuse by first finding what portion of the light is specular (reflected). If you recall, the fresnel term scales the specular portion depending on the angle between the half vector and the view vector. Since the fresnel term determines the magnitude of specular portion, we can use it's compliment to determine the magnitude of the specular portion.
 
-<img src = "https://github.com/user-attachments/assets/42c451e5-30cb-4212-ac9a-f54a06515430" height = "50px" width = "auto"/>
+<img src = "https://github.com/user-attachments/assets/42c451e5-30cb-4212-ac9a-f54a06515430" height = "25px" width = "auto"/>
 
 Then we multiply by the material albedo (c) divided by pi. We divide by pi to ensure that energy is conserved as we integrate over the entire hemisphere of incoming light (As seen in the BRDF).
 
