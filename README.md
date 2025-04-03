@@ -1,26 +1,26 @@
 ![image](https://github.com/user-attachments/assets/2487d8aa-be19-48bf-8af3-130bdca4ac52)
 This project is a Physically Based Rendering (PBR) graphics engine, which uses the principles of PBR to render realistic looking materials based on the Cook-Torrence BRDF (Bidirectional Reflectance Distribution Function). 
 
-<h2> How to Build </h2>
-1. First clone the repository using the command below
+<h2> How to Build (Window)</h2>
+1. First clone the repository using the command below in the terminal
 
-  ```
-  git clone https://github.com/Daschle-Newberry/PBR-Lighting-Engine
-  ```
+```
+git clone https://github.com/Daschle-Newberry/PBR-Lighting-Engine
+```
 
 2. Once within the project directory, run the following command. This will create an jar file for the project that contains all the necessary resources
 
- ```
- gradle shadowjar
- ```
+```
+.\gradlew.bat shadowjar
+```
 
 3. Locate the jar file, it should be in the build\libs folder
 
 4. Copy the jar location and run this command in the terminal
   
-  ```
-  java -jar C:\Users\...\path\to\the\jar
-  ```
+```
+java -jar C:\Users\...\path\to\the\jar
+```
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <h2> Important! </h2>
