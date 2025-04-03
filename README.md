@@ -32,8 +32,7 @@ This project currently has no GUI and it purely a proof of concept for a bigger 
 The BRDF is used to approximate the specular and diffuse portion of the reflectance equation, which is the following: <br/>
 
 <img  src = "https://github.com/user-attachments/assets/bfdfce54-9964-46cc-91cd-63f23084aa3e" height = "50px" width = "auto"/>
-
-
+<br/>
 The function, fr(), is the BRDF part of the reflectance equation. Li() is the incident radiance, and alters the outgoing radiance (Lo) depending on the light intensity and color. The dot product of the normal (n) and the incident light direction (wi) scales the outgoing radiance depending on if the point (or fragment in our case) is facing the light source.
 
 
