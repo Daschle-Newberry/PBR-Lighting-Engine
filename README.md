@@ -65,9 +65,10 @@ Similarly to the NDF, the Geometry function represents the amount of surface are
 <img  src = "https://github.com/user-attachments/assets/686105c7-72d9-4592-9572-3e4b8507d53f" height = "25px" width = "auto"/>
 
 <h4> Fresnel equation (F) </h4>
-The Fresnel equation is perhaps one of the most import parts of the BRDF, and it represents the ratio of light that is reflected over the portion that is refracted. It is calculated using the following equation:
+The Fresnel equation is perhaps one of the most import parts of the BRDF, and it represents the ratio of light that is reflected over the portion that is refracted. It is calculated using the following equation: </br>
 
 <img src = "https://github.com/user-attachments/assets/7794d042-0b84-4fa1-a840-836845f6ff45" height = "25px" width = "auto" />
+
 
 F0 represents the base reflectivity of an object, which determines how reflective each color of a surface albedo is. For example, a gold reflective surface may have a F0 of (1.00, 0.71, 0.29). The Fresnel equation takes the base reflectivity, and increases it by a portion of its complement. How large the compliment is is dependent on the angle between the half vector and the view vector. This calculation causes surfaces to be more reflective when they are observed at grazing angles, similar to real life. 
 
