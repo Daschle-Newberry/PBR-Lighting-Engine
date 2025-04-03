@@ -104,11 +104,11 @@ If you would like to learn more about image based lighting:
 
 <h2> Resources </h2>
 
-<a href = "https://learnopengl.com/"> learnopengl.com </a>: This website is an amazing resource for learning not only OpenGL, but other graphics programming concepts. I used the PBR section to learn essentially everything in this project, and you will see them referenced in my code in some areas. </a> <br/>
+<a href = "https://learnopengl.com/"> learnopengl.com </a>: This website is an amazing resource for learning not only OpenGL, but other graphics programming concepts. I used the PBR section to learn essentially everything in this project, and you will see them referenced in my code in some areas. <br/>
 
-<a href = "https://www.youtube.com/@OGLDEV"> OGLDev on YouTube </a>: OGLDev is an amazing YouTube channel for learning all things computer graphics. He has helped me learn a lot of shadow mapping specifically, which is a bit of a pain. </a> <br/>
+<a href = "https://www.youtube.com/@OGLDEV"> OGLDev on YouTube </a>: OGLDev is an amazing YouTube channel for learning all things computer graphics. He has helped me learn a lot of shadow mapping specifically, which is a bit of a pain.<br/>
 
-<a href = "https://www.youtube.com/@GamesWithGabe"> GamesWithGabe is another amazing YouTube channel for learning all sorts of programming concepts. This channel specifically helped me in my early CGI journey to learn how to use LWJGL for GLFW and OpenGL bindings. I also used this channel when creating some of the basic engine architecture, such as the window class and key listeners. </a>
+<a href = "https://www.youtube.com/@GamesWithGabe"> GamesWithGabe </a> GamesWithGabe is another amazing YouTube channel for learning all sorts of programming concepts. This channel specifically helped me in my early CGI journey to learn how to use LWJGL for GLFW and OpenGL bindings. I also used this channel when creating some of the basic engine architecture, such as the window class and key listeners. </a>
 
 
 
