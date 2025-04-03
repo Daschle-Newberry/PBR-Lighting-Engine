@@ -1,6 +1,10 @@
 ![image](https://github.com/user-attachments/assets/2487d8aa-be19-48bf-8af3-130bdca4ac52)
 This project is a Physically Based Rendering (PBR) graphics engine, which uses the principles of PBR to render realistic looking materials based on the Cook-Torrence BRDF (Bidirectional Reflectance Distribution Function). 
 
+
+
+
+
 The BRDF is used to approximate the specular and diffuse portion of the reflectance equation, which is the following: <br/>
 
 <img  src = "https://github.com/user-attachments/assets/bfdfce54-9964-46cc-91cd-63f23084aa3e" height = "50px" width = "auto"/>
@@ -46,6 +50,8 @@ F0 represents the base reflectivty of an object, which determines how reflective
 
 To finalize the specular term, we divide by 4 times the dot product of the outgoing light direction (view direction) and the normal times the dot product of the incident light direction and the normal. We do this to ensure that the outgoing light does not exceed the incoming light (law of conservation of energy).
 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 The diffuse portion is much simpler than the specular portion and only involves two steps:
 
 <img  src = "https://github.com/user-attachments/assets/201f5e82-7d74-4f16-a380-5df6933a0205" height = "25px" width = "auto"/>
@@ -58,7 +64,7 @@ First we compute the ratio of light that is diffuse by first finding what portio
 
 Then, to find Lambertian term (flambert), we divide the material albedo (c) by pi. The division by pi is to ensure that the outgoing light energy is not greater than the incoming light energy as we integrate over the entire hemisphere (As seen in the BRDF):
 
-<img src = "https://github.com/user-attachments/assets/911d7360-d268-4ac9-91af-eca8e4bcb4c6" height = "25px" width = "auto"/>
+<img src = "https://github.com/user-attachments/assets/911d7360-d268-4ac9-91af-eca8e4bcb4c6" height = "50px" width = "auto"/>
 
 
 
