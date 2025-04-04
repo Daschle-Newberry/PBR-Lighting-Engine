@@ -2,7 +2,7 @@
 This project is a Physically Based Rendering (PBR) graphics engine, which uses the principles of PBR to render realistic looking materials based on the Cook-Torrence BRDF (Bidirectional Reflectance Distribution Function). 
 
 <h2> How to Build (Windows)</h2>
-**This project was built using JDK 23, using prior JDK versions may cause unexpected behavior**
+<strong>This project was built using JDK 23, using prior JDK versions may cause unexpected behavior</strong>
 <p align = "left">
 1. First clone the repository using the command below in the terminal
 
