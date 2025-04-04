@@ -24,11 +24,9 @@ java -jar C:\Users\...\path\to\the\jar
 ```
 
 </p>
-------------------------------------------------------------------------------------------------------
 <h2> Important! </h2>
 This project currently has no GUI and it purely a proof of concept for a bigger project. There is a high likelihood of graphical issues and poor performance as well! These issues will be addressed in a later version of the project.
 
-------------------------------------------------------------------------------------------------------
 <h2> Theory  </h2>
 The BRDF is used to approximate the specular and diffuse portion of the reflectance equation, which is the following: <br/>
 
@@ -93,8 +91,6 @@ We use the kd term to scale the color of the surface, but we must divide the sur
 <img src = "https://github.com/user-attachments/assets/86f8e1f9-c5e8-43f4-85d1-da58bc718d30" height = "25px" width = "auto"/>
 <br/>
 
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 <h2> Note </h2>
 
 While the previous calculations are used to calculate the lighting of an object with respect to a single light source, they do NOT include the image based lighting calculations, which are responsible for the majority of the specular reflections in the scene. The image based lighting is calculated using the same reflectance equation, plus some optimizations to make it possible to compute it over an entire hemisphere of infinite view angles. The primary optimization we make it precomputing the image based lighting, which then utilizes optimizations like the split-sum approximation and importance sampling. Unfortunately, these concepts exceed what can be explained over a github page.
@@ -103,7 +99,6 @@ If you would like to learn more about image based lighting: </br>
 <a href = "https://learnopengl.com/PBR/IBL/Diffuse-irradiance"> Diffuse </a> </br>
 <a href = "https://learnopengl.com/PBR/IBL/Specular-IBL"> Specular </a>
 
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 <h2> Resources </h2>
 
