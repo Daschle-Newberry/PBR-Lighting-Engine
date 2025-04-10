@@ -35,6 +35,11 @@ public class Window {
         this.title = "PBR Engine";
     }
 
+    private void framebufferSizeCallBack(long l, int i, int i1){
+        width = i;
+        height = i1;
+        currentScene.resize();
+    }
     public static Window get(){
         if (Window.window == null){
             Window.window = new Window();
@@ -109,9 +114,9 @@ public class Window {
         glClearColor(.2f,.2f,.2f,1.0f);
 
         currentScene = new MainScene();
+        glfwSetFramebufferSizeCallback(glfwWindow, this::framebufferSizeCallBack);
         currentScene.init();
     }
-
 
     public void loop(){
         double beginTime = Time.getTime();

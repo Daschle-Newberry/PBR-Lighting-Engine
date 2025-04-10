@@ -10,11 +10,13 @@ public class Player implements GameObject{
 
     private Vector3f position;
     private Camera camera;
+    private boolean firstPerson;
 
 
-    public Player(Vector3f position, Camera camera){
+    public Player(Vector3f position, Camera camera, boolean firstPerson){
         this.position = position;
         this.camera = camera;
+        this.firstPerson = firstPerson;
     }
 
 
@@ -53,8 +55,8 @@ public class Player implements GameObject{
 
     @Override
     public void update() {
-        movePlayer();
-        camera.updateCameraPosition(position);
+        if(firstPerson) movePlayer();
+        camera.setPosition(position);
     }
 }
 

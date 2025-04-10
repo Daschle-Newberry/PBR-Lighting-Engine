@@ -34,7 +34,7 @@ public class KeyListener {
         }
     }
 
-    public static boolean isKeyToggled(int keyCode){
+    public boolean isKeyToggled(int keyCode){
         if (keyCode < get().keyToggled.length) {
             return get().keyToggled[keyCode];
         } else {

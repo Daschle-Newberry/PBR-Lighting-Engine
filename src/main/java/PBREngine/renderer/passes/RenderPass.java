@@ -10,16 +10,17 @@ import static PBREngine.renderer.Renderer.B_NONE;
 
 public abstract class RenderPass {
     public abstract void render();
+    public abstract void resizeFramebuffers(Renderer renderer);
+    protected FrameBuffer createFrameBuffer(int[] colorBufferRequest, int depthBufferRequest,Renderer renderer, int width, int height){
 
-    protected FrameBuffer createFrameBuffer(int[] colorBufferRequest, int depthBufferRequest,Renderer renderer){
-
+        System.out.println("Framebuffer Created");
         FrameBuffer FBO;
         if(depthBufferRequest == B_NONE && colorBufferRequest != null){
             Sampler2D[] colorBuffers = new Texture[colorBufferRequest.length];
             for (int i = 0; i < colorBufferRequest.length; i++) {
                 colorBuffers[i] = renderer.ensureColorBuffer(colorBufferRequest[i]);
             }
-            FBO = new FrameBuffer(colorBuffers,2560,1440);
+            FBO = new FrameBuffer(colorBuffers,width,height);
 
         }else if(depthBufferRequest != B_NONE && colorBufferRequest != null){
             Sampler2D[] colorBuffers = new Texture[colorBufferRequest.length];

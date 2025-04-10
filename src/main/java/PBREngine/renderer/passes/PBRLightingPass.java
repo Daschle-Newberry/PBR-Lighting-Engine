@@ -1,5 +1,6 @@
 package PBREngine.renderer.passes;
 
+import PBREngine.engine.Window;
 import PBREngine.engine.scene.elements.model.Model;
 import PBREngine.engine.scene.SceneData;
 import PBREngine.renderer.Renderer;
@@ -17,13 +18,24 @@ public class PBRLightingPass extends RenderPass {
     private SceneData sceneData;
     private Renderer renderer;
     private FrameBuffer FBO;
+    private int[] colorBufferRequests;
+    private int depthBufferRequest;
 
-    public PBRLightingPass(Renderer renderer, SceneData sceneData, int[] colorBufferRequest, int depthBufferRequest) {
+    public PBRLightingPass(Renderer renderer, SceneData sceneData, int[] colorBufferRequests, int depthBufferRequest) {
         if(!shader.isCompiled) shader.compile();
         this.sceneData = sceneData;
         this.renderer = renderer;
+        this.colorBufferRequests = colorBufferRequests;
+        this.depthBufferRequest = depthBufferRequest;
         renderer.createBRDFLUT();
-        FBO = createFrameBuffer(colorBufferRequest,depthBufferRequest,renderer);
+        FBO = createFrameBuffer(colorBufferRequests,depthBufferRequest,renderer, Window.get().width, Window.get().height);
+    }
+
+    @Override
+    public void resizeFramebuffers(Renderer renderer) {
+        FBO.destroy();
+        renderer.createBRDFLUT();
+        FBO = createFrameBuffer(colorBufferRequests,depthBufferRequest, renderer, Window.get().width, Window.get().height);
     }
 
     @Override
@@ -36,7 +48,7 @@ public class PBRLightingPass extends RenderPass {
         shader.use();
         shader.uploadMat4f("cameraProjectionMatrix", sceneData.camera.getProjectionMatrix());
         shader.uploadMat4f("cameraViewMatrix", sceneData.camera.getViewMatrix());
-        shader.uploadVec3f("cameraPosition",sceneData.camera.getCameraPosition());
+        shader.uploadVec3f("cameraPosition",sceneData.camera.getPosition());
 
         shader.uploadMat4f("lightProjectionMatrix",sceneData.sceneLight.getProjectionMatrix());
         shader.uploadMat4f("lightViewMatrix",sceneData.sceneLight.getViewMatrix());

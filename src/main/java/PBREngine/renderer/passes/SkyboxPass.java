@@ -1,5 +1,6 @@
 package PBREngine.renderer.passes;
 
+import PBREngine.engine.Window;
 import PBREngine.engine.scene.SceneData;
 import PBREngine.renderer.Renderer;
 import PBREngine.renderer.Shader;
@@ -16,11 +17,23 @@ public class SkyboxPass extends RenderPass{
     private Renderer renderer;
     private SceneData sceneData;
     private FrameBuffer FBO;
-    public SkyboxPass(Renderer renderer, SceneData sceneData, int[] colorBufferRequest, int depthBufferRequest) {
+    private int[] colorBufferRequests;
+    private int depthBufferRequest;
+
+    public SkyboxPass(Renderer renderer, SceneData sceneData, int[] colorBufferRequests, int depthBufferRequest) {
         if(!shader.isCompiled) shader.compile();
         this.renderer = renderer;
         this.sceneData = sceneData;
-        FBO = createFrameBuffer(colorBufferRequest,depthBufferRequest,renderer);
+        this.colorBufferRequests = colorBufferRequests;
+        this.depthBufferRequest = depthBufferRequest;this.colorBufferRequests = colorBufferRequests;
+        this.depthBufferRequest = depthBufferRequest;
+        FBO = createFrameBuffer(colorBufferRequests,depthBufferRequest, renderer, Window.get().width, Window.get().height);
+    }
+
+    @Override
+    public void resizeFramebuffers(Renderer renderer) {
+        FBO.destroy();
+        FBO = createFrameBuffer(colorBufferRequests,depthBufferRequest, renderer, Window.get().width, Window.get().height);
     }
 
     @Override
@@ -42,4 +55,5 @@ public class SkyboxPass extends RenderPass{
         glBindVertexArray(0);
 
     }
+
 }

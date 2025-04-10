@@ -1,5 +1,6 @@
 package PBREngine.renderer;
 
+import PBREngine.engine.Window;
 import PBREngine.engine.scene.SceneData;
 import PBREngine.renderer.buffers.BRDFLUT;
 import PBREngine.renderer.buffers.Sampler2D;
@@ -9,6 +10,7 @@ import PBREngine.renderer.passes.*;
 import java.util.*;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.GL_RGBA16F;
 
 public class Renderer {
     public static final int B_NONE = -1;
@@ -33,21 +35,49 @@ public class Renderer {
     public static final int B_SHADOWMAP = 17;
 
 
+
     public SceneData sceneData;
 
     public Map<Integer, Sampler2D> buffers = new HashMap<>();
-
     private LinkedList<RenderPass> renderPasses =  new LinkedList<>();
+
+    private boolean pbrON = false;
+
     public Renderer(SceneData sceneData) {
         this.sceneData = sceneData;
-        addPasses();
+        addPassesShaded();
     }
-    private void addPasses() {
+
+    public void resize(){
+        buffers = new HashMap<>();
+        for(RenderPass p : renderPasses){
+            p.resizeFramebuffers(this);
+        }
+    }
+
+    public void swapRenderType(boolean isToggled){
+        if(isToggled && !pbrON){
+            addPassesShaded();
+            pbrON = true;
+        }
+        else if(!isToggled && pbrON){
+            addPassesDebug();
+            pbrON = false;
+        }
+    }
+    public void addPassesDebug() {
+        renderPasses = new LinkedList<>();
+        renderPasses.add(new DepthPass(this,sceneData, sceneData.sceneLight,B_SHADOWMAP));
+        renderPasses.add(new SkyboxPass(this,sceneData,new int[]{B_COLORTEX0},B_NONE));
+        renderPasses.add(new DebugLightingPass(this,sceneData,new int[]{B_COLORTEX0},B_DEPTHTEX0));
+        renderPasses.add(new FinalPass(this,new int[]{B_COLORTEX0},B_NONE));
+    }
+    public void addPassesShaded(){
+        renderPasses = new LinkedList<>();
         renderPasses.add(new DepthPass(this,sceneData, sceneData.sceneLight,B_SHADOWMAP));
         renderPasses.add(new SkyboxPass(this,sceneData,new int[]{B_COLORTEX0},B_NONE));
         renderPasses.add(new PBRLightingPass(this,sceneData,new int[]{B_COLORTEX0},B_DEPTHTEX0));
         renderPasses.add(new FinalPass(this,new int[]{B_COLORTEX0},B_NONE));
-
     }
     public Sampler2D getBuffer(int name) {
         Sampler2D uniform = buffers.get(name);
@@ -56,11 +86,11 @@ public class Renderer {
     }
 
     public Sampler2D ensureColorBuffer(int type){
-        Sampler2D buffer = buffers.computeIfAbsent(type, _ -> new Texture(GL_RGBA16, GL_RGBA,2560,1440,type));
+        Sampler2D buffer = buffers.computeIfAbsent(type, _ -> new Texture(GL_RGBA16F, GL_RGBA, Window.get().width,Window.get().height, type));
         return buffer;
     }
     public Sampler2D ensureDepthBuffer(int type){
-        Sampler2D buffer = buffers.computeIfAbsent(type, _ ->new Texture(GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT,2560,1440,type));
+        Sampler2D buffer = buffers.computeIfAbsent(type, _ ->new Texture(GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT,Window.get().width,Window.get().height,type));
         return buffer;
     }
 

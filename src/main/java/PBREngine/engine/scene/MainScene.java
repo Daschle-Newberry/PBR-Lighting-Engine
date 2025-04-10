@@ -1,12 +1,13 @@
 package PBREngine.engine.scene;
 
-import PBREngine.engine.Window;
+import PBREngine.engine.input.KeyListener;
+import PBREngine.engine.scene.elements.Controllable;
+import PBREngine.engine.scene.elements.FPCamera;
+import PBREngine.engine.scene.elements.OrbitCamera;
 import PBREngine.engine.scene.elements.model.Model;
 import PBREngine.engine.scene.elements.reflectionProbe.ReflectionProbeGrid;
-import PBREngine.engine.gameobjects.GameObject;
 import PBREngine.engine.scene.elements.emitters.DirectionalLight;
 import PBREngine.engine.scene.elements.emitters.PointLight;
-import PBREngine.engine.scene.elements.Camera;
 import PBREngine.engine.gameobjects.Player;
 import PBREngine.engine.input.MouseListener;
 import PBREngine.engine.scene.elements.CubeMap;
@@ -16,6 +17,9 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 
 public class MainScene extends Scene{
     //Scene Elements
@@ -50,8 +54,7 @@ public class MainScene extends Scene{
                 new Vector3f(0.0f,0.0f,0.0f),
                 new Matrix4f().ortho(-4f,4f,-3,3,0.1f,10));
 
-        sceneData.camera = new Camera(new Vector3f(0.0f,0.0f,0.0f));
-
+        sceneData.camera = new OrbitCamera(new Vector3f(0.0f,0.0f,0.0f), new Vector3f(0.0f,0.0f,0.0f));
         sceneData.skybox = new CubeMap("/assets/skybox/newport_loft.hdr");
 
         Model floor =  new  Model("/assets/models/floor.obj","/assets/materials/concrete");
@@ -104,18 +107,26 @@ public class MainScene extends Scene{
 
         sceneData.probeGrid.update();
 
-        //Gameplay Elements
-        player = new Player(new Vector3f(0,0,0),sceneData.camera);
-
         //Render Elements
         this.renderer = new Renderer(sceneData);
     }
 
     @Override
+    public void resize(){
+        renderer.resize();
+    }
+    @Override
     public void update(double dt) {
-        sceneData.camera.processMouseMovement(MouseListener.getDx(),MouseListener.getDy());
+        if(sceneData.camera instanceof Controllable controllableCamera){
+            controllableCamera.processMouseMovement(MouseListener.getDx(),MouseListener.getDy());
+            controllableCamera.processKeyInput();
+            controllableCamera.processMouseInput();
+        }
+
+        renderer.swapRenderType(KeyListener.get().isKeyToggled(GLFW_KEY_SPACE));
+
+
         MouseListener.proccessMovement();
-        player.update();
         render();
     }
 

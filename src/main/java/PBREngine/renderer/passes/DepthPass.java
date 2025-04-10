@@ -1,8 +1,9 @@
 package PBREngine.renderer.passes;
 
+import PBREngine.engine.Window;
+import PBREngine.engine.scene.elements.Camera;
 import PBREngine.engine.scene.elements.model.Model;
 import PBREngine.engine.scene.SceneData;
-import PBREngine.engine.scene.elements.Perspective;
 import PBREngine.renderer.Renderer;
 import PBREngine.renderer.Shader;
 import PBREngine.renderer.Shaders;
@@ -15,14 +16,22 @@ public class DepthPass extends RenderPass {
     private static Shader shader = Shaders.depthProgram;
     private SceneData sceneData;
     private FrameBuffer FBO;
-    private Perspective perspective;
+    private Camera perspective;
+    private int depthBufferRequest;
 
-    public DepthPass(Renderer renderer, SceneData sceneData, Perspective perspective, int depthBufferRequest) {
+    public DepthPass(Renderer renderer, SceneData sceneData, Camera perspective, int depthBufferRequest) {
         if(!shader.isCompiled) shader.compile();
         if(!Shaders.probeProgram.isCompiled) Shaders.probeProgram.compile();
+        this.depthBufferRequest = depthBufferRequest;
         this.sceneData = sceneData;
-        FBO = createFrameBuffer(null,depthBufferRequest,renderer);
+        FBO = createFrameBuffer(null,depthBufferRequest,renderer, Window.get().width, Window.get().height);
         this.perspective = perspective;
+    }
+
+    @Override
+    public void resizeFramebuffers(Renderer renderer) {
+        FBO.destroy();
+        FBO = createFrameBuffer(null,depthBufferRequest, renderer, Window.get().width, Window.get().height);
     }
 
     @Override

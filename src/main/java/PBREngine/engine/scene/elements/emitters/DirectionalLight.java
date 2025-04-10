@@ -1,10 +1,10 @@
 package PBREngine.engine.scene.elements.emitters;
 
-import PBREngine.engine.scene.elements.Perspective;
+import PBREngine.engine.scene.elements.Camera;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-public class DirectionalLight implements Perspective {
+public class DirectionalLight implements Camera {
     private Matrix4f viewMatrix = new Matrix4f();
     private Matrix4f projectionMatrix = new Matrix4f();
 
@@ -34,15 +34,27 @@ public class DirectionalLight implements Perspective {
     }
 
     @Override
-    public Matrix4f getProjectionMatrix(){return this.projectionMatrix;}
+    public Matrix4f getProjectionMatrix(){return projectionMatrix;}
 
     @Override
     public Matrix4f getViewMatrixNoTranslation() {
         return null;
     }
 
-    public void setLightPos(Vector3f newPos){this.position = newPos;}
+    @Override
+    public Vector3f getFrontVector() {return this.lightFront;}
 
+    @Override
+    public Vector3f getRightVector() {
+        Vector3f result = new Vector3f();
+        this.lightUp.cross(this.lightFront,result).normalize();
+        return result;
+    }
+
+    @Override
+    public void setPosition(Vector3f position) {
+
+    }
 
     public Vector3f getPosition(){
         return this.position;

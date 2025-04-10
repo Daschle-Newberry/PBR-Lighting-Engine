@@ -35,6 +35,8 @@ public class Model extends Mesh{
     public void bindMaterial(){
         material.bind();
     }
+
+
     public void bindEnvironmentMap(){
         environmentMap.bindSpecularMap();
         environmentMap.bindDiffuseMap();

@@ -5,9 +5,6 @@ import PBREngine.renderer.Renderer;
 import PBREngine.renderer.Shader;
 import PBREngine.renderer.Shaders;
 import PBREngine.renderer.buffers.FrameBuffer;
-import org.lwjgl.BufferUtils;
-
-import java.nio.FloatBuffer;
 
 import static PBREngine.renderer.Renderer.B_COLORTEX0;
 import static org.lwjgl.opengl.GL11.*;
@@ -19,14 +16,23 @@ public class FinalPass extends RenderPass {
     private static Shader shader = Shaders.screenProgram;
     private Renderer renderer;
     private FrameBuffer FBO;
+    private int[] colorBufferRequests;
+    private int depthBufferRequest;
 
-    private int screenQuad;
-
-    public FinalPass(Renderer renderer,int[] colorBufferRequest,int depthBufferRequest){
+    public FinalPass(Renderer renderer,int[] colorBufferRequests,int depthBufferRequest){
         if(!shader.isCompiled) shader.compile();
         this.renderer = renderer;
-        FBO = createFrameBuffer(colorBufferRequest,depthBufferRequest,renderer);
+        this.colorBufferRequests = colorBufferRequests;
+        this.depthBufferRequest = depthBufferRequest;
+        FBO = createFrameBuffer(colorBufferRequests,depthBufferRequest,renderer, Window.get().width, Window.get().height);
     }
+
+    @Override
+    public void resizeFramebuffers(Renderer renderer) {
+        FBO.destroy();
+        FBO = createFrameBuffer(colorBufferRequests,depthBufferRequest, renderer, Window.get().width, Window.get().height);
+    }
+
     @Override
     public void render() {
         glBindFramebuffer(GL_FRAMEBUFFER,0);

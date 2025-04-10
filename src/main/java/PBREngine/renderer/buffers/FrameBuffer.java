@@ -84,6 +84,10 @@ public class FrameBuffer {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER,0);
     }
 
+    public void destroy(){
+        glDeleteFramebuffers(fboID);
+    }
+
 
 
 }
