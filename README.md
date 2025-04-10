@@ -1,7 +1,6 @@
 ![image](https://github.com/user-attachments/assets/2487d8aa-be19-48bf-8af3-130bdca4ac52)
 ![image](https://github.com/user-attachments/assets/7fc4c5c4-bf7e-4d0a-b987-f7727115574d)
-![image](https://github.com/user-attachments/assets/52fe1204-3388-45ca-a77d-cc2decc826d3)
-![image](https://github.com/user-attachments/assets/27c2dc42-e635-4227-8730-4bfff298fb72)
+
 
 This project is a Physically Based Rendering (PBR) graphics engine, which uses the principles of PBR to render realistic looking materials based on the Cook-Torrence BRDF (Bidirectional Reflectance Distribution Function). 
 
